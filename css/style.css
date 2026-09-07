@@ -436,12 +436,66 @@ button, input, select, textarea {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
+  gap: 0.5rem;
 }
 
 .script-counter-text {
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-muted);
+}
+
+.script-meta-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-furigana-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 700;
+  border: 1px solid var(--border-card);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-furigana-toggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-furigana-toggle.active {
+  background: hsla(217, 91%, 60%, 0.12);
+  border-color: hsla(217, 91%, 60%, 0.4);
+  color: hsl(217, 91%, 45%);
+}
+
+[data-theme="dark"] .btn-furigana-toggle.active {
+  background: hsla(217, 91%, 60%, 0.2);
+  border-color: hsla(217, 91%, 60%, 0.5);
+  color: hsl(217, 91%, 70%);
+}
+
+.btn-furigana-toggle .furigana-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: hsla(217, 91%, 60%, 0.15);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: inherit;
 }
 
 .script-badge {
@@ -485,9 +539,26 @@ button, input, select, textarea {
 .script-text {
   font-weight: 600;
   color: var(--text-main);
-  line-height: 1.65;
+  line-height: 2.15;
   user-select: none;
   transition: font-size 0.2s ease;
+}
+
+.script-text ruby {
+  ruby-align: center;
+}
+
+.script-text rt {
+  font-size: 0.52em;
+  font-weight: 600;
+  color: hsl(217, 85%, 45%);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  user-select: none;
+}
+
+[data-theme="dark"] .script-text rt {
+  color: hsl(217, 85%, 70%);
 }
 
 .font-normal { font-size: 1.15rem; }

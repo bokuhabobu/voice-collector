@@ -73,6 +73,7 @@ export const translations = {
     prevScriptBtn: "← 前の文",
     nextScriptBtn: "次の文 →",
     fontSizeBtn: "文字サイズ",
+    furiganaBtn: "ふりがな",
     customScriptPlaceholder: "ここに読み上げたい任意のテキストを入力してください...",
     addCustomScriptBtn: "追加",
 
@@ -184,6 +185,7 @@ export const translations = {
     prevScriptBtn: "← Prev",
     nextScriptBtn: "Next →",
     fontSizeBtn: "Font Size",
+    furiganaBtn: "Furigana",
     customScriptPlaceholder: "Enter any custom sentence to read aloud...",
     addCustomScriptBtn: "Add",
 
@@ -295,6 +297,7 @@ export const translations = {
     prevScriptBtn: "← ก่อนหน้า",
     nextScriptBtn: "ถัดไป →",
     fontSizeBtn: "ขนาดตัวอักษร",
+    furiganaBtn: "ฟูริงานะ",
     customScriptPlaceholder: "พิมพ์ข้อความที่ต้องการให้อ่านออกเสียงที่นี่...",
     addCustomScriptBtn: "เพิ่ม",
 

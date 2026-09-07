@@ -265,7 +265,13 @@
           <span id="scriptCounterText" class="script-counter-text">スクリプト 1 / 30</span>
           <span id="scriptCategoryLabel" style="font-size:0.82rem; color:var(--text-muted); margin-left: 0.5rem; font-weight: 600;"></span>
         </div>
-        <span id="scriptStatusBadge" class="script-badge badge-unrecorded">○ 未録音</span>
+        <div class="script-meta-actions">
+          <button type="button" id="furiganaToggleBtn" class="btn-furigana-toggle active" title="ふりがな表示切替">
+            <span class="furigana-icon">あ</span>
+            <span class="furigana-text" data-i18n="furiganaBtn">ふりがな</span>
+          </button>
+          <span id="scriptStatusBadge" class="script-badge badge-unrecorded">○ 未録音</span>
+        </div>
       </div>
 
       <!-- Large Prompter Box (Max size font-xlarge) -->
@@ -482,6 +488,6 @@
 
   <!-- Scripts -->
   <script src="lib/jszip.min.js"></script>
-  <script type="module" src="js/app.js?v=2.4"></script>
+  <script type="module" src="js/app.js?v=2.5"></script>
 </body>
 </html>
