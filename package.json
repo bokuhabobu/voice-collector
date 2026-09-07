@@ -1,0 +1,23 @@
+{
+  "name": "voice-collector",
+  "version": "1.0.0",
+  "description": "Browser-based 16kHz WAV Audio Dataset Collector for STT Benchmark",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "serve": "npx -y serve .",
+    "test": "node test_wav_structure.mjs"
+  },
+  "keywords": [
+    "speech-to-text",
+    "stt",
+    "asr",
+    "audio-recorder",
+    "wav",
+    "dataset-collection",
+    "whisper",
+    "sherpa-onnx"
+  ],
+  "author": "",
+  "license": "MIT"
+}

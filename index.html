@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VoiceCollector</title>
+  <meta name="description" content="16kHz WAV高音質録音・音声データセット収集Webアプリケーション">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sticky Clean White Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <h1 class="brand-title" data-i18n="appTitle">VoiceCollector</h1>
+      </div>
+
+      <div class="header-actions">
+        <!-- Language Switcher -->
+        <select id="langSelect" class="lang-dropdown" aria-label="Select Language">
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="en">🇺🇸 English</option>
+          <option value="th">🇹🇭 ภาษาไทย</option>
+        </select>
+
+        <!-- Home Only Actions (Hidden in Setup Page) -->
+        <div id="homeHeaderActions" class="header-actions-group">
+          <!-- Recordings Count Badge / Open Modal -->
+          <button id="viewListBtn" type="button" class="badge-saved-count btn" style="border:none; cursor:pointer;" title="録音リストを見る">
+            💾 <span id="savedCountBadge">0 件の録音</span>
+          </button>
+
+          <!-- Export ZIP Button -->
+          <button id="exportZipBtn" type="button" class="btn btn-primary btn-sm" data-i18n="exportZipBtn">
+            📦 ZIP保存
+          </button>
+
+          <!-- README Guide Button -->
+          <button id="readmeBtn" type="button" class="btn btn-outline btn-sm" data-i18n="readmeBtn">
+            📖 README
+          </button>
+        </div>
+
+        <!-- Dark/Light Theme Toggle -->
+        <button id="themeToggleBtn" type="button" class="btn btn-outline btn-sm" aria-label="Toggle Theme" title="テーマ切替">
+          🌓
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- View 1: Setup Pre-Page (Before Home) -->
+  <section id="setupPage" class="setup-page-view" aria-label="Speaker Profile Setup">
+    <div class="setup-card">
+      <div class="setup-header">
+        <div class="setup-badge-icon">🎙️</div>
+        <h2 class="setup-title" data-i18n="setupWelcomeTitle">VoiceCollector へようこそ</h2>
+        <p class="setup-subtitle" data-i18n="setupSubtitle">
+          録音をはじめる前にお名前と性別を入力・選択してください。
+        </p>
+      </div>
+
+      <div class="setup-form">
+        <!-- Speaker Input -->
+        <div class="input-field-group">
+          <label for="setupSpeakerInput" class="input-label">
+            <span data-i18n="speakerLabel">お名前</span>
+            <span class="badge-tag-required">必須</span>
+          </label>
+          <input type="text" id="setupSpeakerInput" class="text-input text-input-lg" data-i18n-placeholder="speakerPlaceholder" placeholder="例: 田中 太郎">
+        </div>
+
+        <!-- Gender Selection (Male / Female) -->
+        <div class="input-field-group">
+          <label class="input-label">
+            <span data-i18n="genderLabel">性別</span>
+            <span class="badge-tag-required">必須</span>
+          </label>
+          <div class="gender-selector-group" role="radiogroup" aria-label="性別選択">
+            <button type="button" id="setupGenderMaleBtn" class="btn-gender-chip" data-gender="male">
+              <span class="gender-chip-icon">👨</span>
+              <span class="gender-chip-text" data-i18n="genderMale">男性</span>
+            </button>
+            <button type="button" id="setupGenderFemaleBtn" class="btn-gender-chip" data-gender="female">
+              <span class="gender-chip-icon">👩</span>
+              <span class="gender-chip-text" data-i18n="genderFemale">女性</span>
+            </button>
+          </div>
+          <div id="setupGenderError" class="setup-field-hint hidden" data-i18n="genderRequiredHint">
+            ※ 男性または女性を選択してください
+          </div>
+        </div>
+
+        <!-- Custom Note Input -->
+        <div class="input-field-group">
+          <label for="setupNoteInput" class="input-label" data-i18n="customNoteLabel">備考・補足（任意）</label>
+          <input type="text" id="setupNoteInput" class="text-input" data-i18n-placeholder="customNotePlaceholder" placeholder="例: エアコン直下、早口、小声、マスク着用など">
+        </div>
+
+        <!-- Proceed to Recording Home Button -->
+        <div class="setup-action-row">
+          <button type="button" id="startRecordingBtn" class="btn btn-primary btn-start-recording" data-i18n="startRecordingBtn">
+            録音画面へ進む →
+          </button>
+        </div>
+
+        <p class="setup-auto-hint" data-i18n="setupAutoSavedHint">
+          ※ 入力した情報はブラウザに自動保存されます
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- View 2: Main Recording Home Container -->
+  <main id="mainHomeView" class="main-container hidden">
+
+    <!-- Section 1: Basic Info (Speaker & Gender Summary) -->
+    <section class="glass-card" aria-labelledby="metaHeading">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2 id="metaHeading" class="card-title">
+          <span>🏷️</span>
+          <span data-i18n="metaSectionTitle">1. 基本情報</span>
+        </h2>
+        <button id="backToSetupBtn" type="button" class="btn btn-outline btn-sm" data-i18n="backToSetupBtn" title="話者名・性別を変更する">
+          ✏️ プロフィール変更
+        </button>
+      </div>
+
+      <div class="meta-grid">
+        <!-- Speaker Input (Auto Persisted) -->
+        <div class="input-field-group">
+          <label for="speakerInput" class="input-label" data-i18n="speakerLabel">お名前</label>
+          <input type="text" id="speakerInput" class="text-input" data-i18n-placeholder="speakerPlaceholder" placeholder="例: 田中 太郎">
+        </div>
+
+        <!-- Gender Chip Selection in Home -->
+        <div class="input-field-group">
+          <label class="input-label" data-i18n="genderLabel">性別</label>
+          <div class="gender-selector-group gender-selector-compact" role="radiogroup">
+            <button type="button" id="homeGenderMaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="male">
+              <span class="gender-chip-icon">👨</span>
+              <span class="gender-chip-text" data-i18n="genderMale">男性</span>
+            </button>
+            <button type="button" id="homeGenderFemaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="female">
+              <span class="gender-chip-icon">👩</span>
+              <span class="gender-chip-text" data-i18n="genderFemale">女性</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Note Input (Auto Persisted) -->
+        <div class="input-field-group" style="grid-column: 1 / -1;">
+          <label for="customNoteInput" class="input-label" data-i18n="customNoteLabel">備考・補足</label>
+          <input type="text" id="customNoteInput" class="text-input" data-i18n-placeholder="customNotePlaceholder" placeholder="例: エアコン直下、早口、小声、マスク着用など">
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Script Prompter Hero -->
+    <section class="glass-card prompter-card" aria-labelledby="scriptHeading">
+      <div class="prompter-top-bar">
+        <h2 id="scriptHeading" class="card-title">
+          <span>📜</span>
+          <span data-i18n="scriptSectionTitle">2. 読み上げスクリプト</span>
+        </h2>
+
+        <!-- Script Language Tabs & Category Filter -->
+        <div class="prompter-controls-group">
+          <!-- Script Language Selector -->
+          <div id="scriptLangButtons" class="script-lang-buttons" role="tablist" aria-label="Script Language">
+            <button type="button" class="btn-lang-tab active" data-script-lang="ja">🇯🇵 日本語</button>
+            <button type="button" class="btn-lang-tab" data-script-lang="en">🇺🇸 English</button>
+            <button type="button" class="btn-lang-tab" data-script-lang="th">🇹🇭 ไทย</button>
+          </div>
+
+          <div class="filter-group">
+            <select id="categorySelect" class="category-select" aria-label="Select Category">
+              <option value="all" data-i18n="categories.all">すべて</option>
+              <option value="short" data-i18n="categories.short">短文テスト</option>
+              <option value="command" data-i18n="categories.command">現場交信・指令</option>
+              <option value="phonetic" data-i18n="categories.phonetic">音素バランス</option>
+              <option value="kochi" data-i18n="categories.kochi">高知弁</option>
+              <option value="number" data-i18n="categories.number">数字・単位</option>
+              <option value="long" data-i18n="categories.long">長文</option>
+              <option value="custom" data-i18n="categories.custom">カスタム入力</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div id="scriptProgressBar" class="progress-bar"></div>
+      </div>
+
+      <div class="script-meta-row">
+        <div>
+          <span id="scriptCounterText" class="script-counter-text">スクリプト 1 / 30</span>
+          <span id="scriptCategoryLabel" style="font-size:0.82rem; color:var(--text-muted); margin-left: 0.5rem; font-weight: 600;"></span>
+        </div>
+        <span id="scriptStatusBadge" class="script-badge badge-unrecorded">○ 未録音</span>
+      </div>
+
+      <!-- Large Prompter Box (Max size font-xlarge) -->
+      <div class="script-display-box">
+        <p id="scriptDisplayArea" class="script-text font-xlarge">
+          これから音声認識テストをはじめます。
+        </p>
+      </div>
+
+      <!-- Custom Script Add Input (Shown when category === custom) -->
+      <div id="customScriptAddContainer" class="custom-script-add-box hidden">
+        <input type="text" id="customScriptTextInput" class="text-input" data-i18n-placeholder="customScriptPlaceholder" placeholder="ここに読み上げたい任意のテキストを入力してください...">
+        <button id="addCustomScriptBtn" type="button" class="btn btn-primary" data-i18n="addCustomScriptBtn">追加</button>
+      </div>
+
+      <!-- Prompter Navigation -->
+      <div class="prompter-nav-bar">
+        <button id="prevScriptBtn" type="button" class="btn btn-outline" data-i18n="prevScriptBtn">
+          ← 前の文
+        </button>
+        <button id="nextScriptBtn" type="button" class="btn btn-outline" data-i18n="nextScriptBtn">
+          次の文 →
+        </button>
+      </div>
+    </section>
+
+    <!-- Section 3: Recorder Controls & Oscilloscope -->
+    <section class="glass-card recorder-card" aria-labelledby="recorderHeading">
+      <div class="card-header" style="width: 100%;">
+        <h2 id="recorderHeading" class="card-title">
+          <span>🎙️</span>
+          <span data-i18n="recorderSectionTitle">3. 録音 & 確認</span>
+        </h2>
+      </div>
+
+      <!-- Live Oscilloscope Visualizer -->
+      <canvas id="waveformCanvas" class="waveform-canvas" width="600" height="90"></canvas>
+
+      <!-- Digital Timer -->
+      <div id="recordTimer" class="record-timer">00.0s</div>
+      <div id="micStatusText" class="mic-status-text" data-i18n="micReady">マイク準備完了</div>
+
+      <!-- Trigger Action (Start / Stop) -->
+      <div id="recordActionContainer" class="record-trigger-container">
+        <!-- Big Record Button -->
+        <button id="recordBtn" type="button" class="btn-big-record" aria-label="Start Recording" title="録音開始">
+          ⏺
+        </button>
+        <!-- Big Stop Button (Hidden initially) -->
+        <button id="stopBtn" type="button" class="btn-big-stop hidden" aria-label="Stop Recording" title="停止する">
+          ⏹
+        </button>
+      </div>
+
+      <!-- Reviewing & Next Controls (Hidden initially) -->
+      <div id="reviewControls" class="review-controls hidden">
+        <audio id="audioPreviewPlayer" class="preview-audio-player" controls></audio>
+        <div class="review-btn-row">
+          <button id="reRecordBtn" type="button" class="btn btn-rerecord" data-i18n="reRecordBtn">
+            ↺ もう一度録り直す
+          </button>
+          <button id="saveAndNextBtn" type="button" class="btn btn-advance-save" data-i18n="saveAndNextBtn">
+            ✓ 保存して次の文へ
+          </button>
+        </div>
+      </div>
+
+      <div class="audio-spec-footer" data-i18n="audioSpecInfo">
+        16,000 Hz / 16-bit WAV
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Saved Recordings List -->
+  <div id="recordingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle" class="card-title">
+          <span>📂</span>
+          <span data-i18n="modalTitle">録音済みデータ一覧</span>
+        </h3>
+        <button id="closeModalBtn" type="button" class="btn btn-outline btn-sm" aria-label="Close" data-i18n="closeBtn">
+          ✕
+        </button>
+      </div>
+
+      <div id="recordingsListContainer" class="modal-body">
+        <!-- Populated via JS -->
+      </div>
+
+      <div class="modal-footer">
+        <button id="deleteAllRecordingsBtn" type="button" class="btn btn-danger btn-sm" data-i18n="deleteAllBtn">
+          🗑 すべて削除
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('exportZipBtn').click();">
+          📦 ZIP保存
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: README Guide -->
+  <div id="readmeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="readmeModalTitle">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="readmeModalTitle" class="card-title">
+          <span>📖</span>
+          <span data-i18n="readmeModalTitle">VoiceCollector - 概要と利用手順</span>
+        </h3>
+        <button id="closeReadmeModalBtn" type="button" class="btn btn-outline btn-sm" aria-label="Close" data-i18n="closeBtn">
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div>
+            <strong style="color: var(--text-main); font-size: 0.95rem;" data-i18n="readmeSummaryTitle">【アプリの概要】</strong>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.35rem; line-height: 1.6;" data-i18n="readmeSummaryText">
+              このアプリは音声をブラウザ上で録音し、一つのzipデータセットとしてまとめるツールです。
+            </p>
+          </div>
+
+          <div>
+            <strong style="color: var(--text-main); font-size: 0.95rem;" data-i18n="readmeStepsTitle">【利用手順】</strong>
+            <ol style="padding-left: 1.2rem; margin-top: 0.4rem; display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+              <li data-i18n="readmeStep1">1. 事前設定画面で「話者名」を入力し、「性別（男性/女性）」を選択して録音画面へ進みます。</li>
+              <li data-i18n="readmeStep2">2. お好みの言語（日本語/英語/タイ語）とカテゴリを選び、画面のスクリプトを読み上げながら「録音開始」を押します。</li>
+              <li data-i18n="readmeStep3">3. 読み終わったら「停止」を押し、保存（「✓ 保存して次の文へ」）または読み直し（「↺ もう一度録り直す」）を選択します。</li>
+              <li data-i18n="readmeStep4">4. 全ての録音が完了したら、右上の「📦 ZIP保存」を押してダウンロードします。</li>
+            </ol>
+          </div>
+
+          <!-- Direct Email Submission Links Area -->
+          <div class="submission-links-card">
+            <strong style="color: var(--text-main); font-size: 0.92rem;" data-i18n="readmeSubmissionTitle">【メール送信】</strong>
+            <p style="font-size: 0.84rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.5;" data-i18n="readmeSubmissionDesc">
+              ZIP保存後、下のボタンからメールを起動してファイルを送付できます。
+            </p>
+            <div style="margin-top: 0.75rem;">
+              <button id="readmeEmailSubmitBtn" type="button" class="btn btn-primary btn-sm submit-action-btn" data-i18n="emailSubmitBtn">
+                ✉️ メールで送付（ynagasawa@spacetime-eng.com）
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button id="closeReadmeFooterBtn" type="button" class="btn btn-primary btn-sm" data-i18n="readmeCloseBtn">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Post-Export Submission Dialog -->
+  <div id="submitModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="submitModalTitle">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 id="submitModalTitle" class="card-title">
+          <span>📦</span>
+          <span data-i18n="zipExportDialogTitle">ZIP保存完了</span>
+        </h3>
+        <button id="closeSubmitModalBtn" type="button" class="btn btn-outline btn-sm" aria-label="Close" data-i18n="closeBtn">
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;" data-i18n="zipExportDialogDesc">
+          ZIPファイルの保存が完了しました。下のボタンからメールを起動し、ファイルを添付して送信してください。
+        </p>
+
+        <div class="submit-action-grid" style="margin-top: 1.25rem;">
+          <button id="submitViaEmailBtn" type="button" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem 1.2rem; font-size: 0.98rem; font-weight: 700;">
+            ✉️ メールを起動する（ynagasawa@spacetime-eng.com 宛）
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button id="closeSubmitFooterBtn" type="button" class="btn btn-outline btn-sm" data-i18n="closeBtn">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="lib/jszip.min.js"></script>
+  <script type="module" src="js/app.js?v=2.1"></script>
+</body>
+</html>
