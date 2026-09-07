@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.1';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.1';
-import { AudioRecorder } from './audio_recorder.js?v=2.1';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.1';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.1';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.2';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.2';
+import { AudioRecorder } from './audio_recorder.js?v=2.2';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.2';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.2';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -154,12 +154,12 @@ class VoiceCollectorApp {
       this._updateGenderChipsUI();
     }
 
-    // Restore script language
+    // Restore script language (Default: 'ja')
     const savedScriptLang = localStorage.getItem(STORAGE_KEY_SCRIPT_LANG);
     if (savedScriptLang) {
       this.currentScriptLang = savedScriptLang;
     } else {
-      this.currentScriptLang = getLanguage();
+      this.currentScriptLang = 'ja';
     }
     this._updateScriptLangTabsUI();
     this._updateCategoryDropdownOptions();

@@ -370,10 +370,8 @@ export function initI18n() {
   if (saved && translations[saved]) {
     currentLang = saved;
   } else {
-    const navLang = (navigator.language || '').toLowerCase();
-    if (navLang.startsWith('th')) currentLang = 'th';
-    else if (navLang.startsWith('en')) currentLang = 'en';
-    else currentLang = 'ja';
+    // Always default to Japanese
+    currentLang = 'ja';
   }
   applyTranslations();
 }
