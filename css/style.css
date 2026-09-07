@@ -251,6 +251,20 @@ button, input, select, textarea {
 /* ==========================================================================
    Main Layout Container
    ========================================================================== */
+/* If setup is completed, hide setupPage and show home containers instantly */
+html.setup-completed #setupPage {
+  display: none !important;
+}
+html.setup-completed #mainHomeView {
+  display: flex !important;
+}
+html.setup-completed #homeHeaderActions {
+  display: flex !important;
+}
+html.setup-completed #mobileHomeMenuItems {
+  display: block !important;
+}
+
 .main-container {
   max-width: 900px;
   width: 100%;

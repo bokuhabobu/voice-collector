@@ -12,6 +12,16 @@
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Early check: if user already set up their profile, immediately show home view
+    try {
+      if (localStorage.getItem('voice_collector_setup_completed') === 'true' ||
+          localStorage.getItem('voice_collector_saved_speaker') ||
+          localStorage.getItem('voice_collector_saved_gender')) {
+        document.documentElement.classList.add('setup-completed');
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
@@ -488,6 +498,6 @@
 
   <!-- Scripts -->
   <script src="lib/jszip.min.js"></script>
-  <script type="module" src="js/app.js?v=2.5"></script>
+  <script type="module" src="js/app.js?v=2.6"></script>
 </body>
 </html>

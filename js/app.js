@@ -3,17 +3,18 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.5';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.5';
-import { AudioRecorder } from './audio_recorder.js?v=2.5';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.5';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.5';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.6';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.6';
+import { AudioRecorder } from './audio_recorder.js?v=2.6';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.6';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.6';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
 const STORAGE_KEY_NOTE = 'voice_collector_saved_note';
 const STORAGE_KEY_SCRIPT_LANG = 'voice_collector_saved_script_lang';
 const STORAGE_KEY_FURIGANA = 'voice_collector_saved_furigana';
+const STORAGE_KEY_SETUP_COMPLETED = 'voice_collector_setup_completed';
 
 class VoiceCollectorApp {
   constructor() {
@@ -191,8 +192,15 @@ class VoiceCollectorApp {
     this._updateScriptLangTabsUI();
     this._updateCategoryDropdownOptions();
 
-    // Set initial view to setup page
-    this.showSetupView();
+    // Check if the user has already entered their info previously (skip setup page on next visits)
+    const setupCompleted = localStorage.getItem(STORAGE_KEY_SETUP_COMPLETED) === 'true';
+    const hasProfileInfo = Boolean(savedSpeaker || (savedGender === 'male' || savedGender === 'female'));
+
+    if (setupCompleted || hasProfileInfo) {
+      this.showHomeView();
+    } else {
+      this.showSetupView();
+    }
   }
 
   _updateCategoryDropdownOptions() {
@@ -605,6 +613,9 @@ class VoiceCollectorApp {
       localStorage.setItem(STORAGE_KEY_SPEAKER, defaultName);
     }
 
+    // Mark setup as completed so the first page is never displayed again on revisit/reload
+    localStorage.setItem(STORAGE_KEY_SETUP_COMPLETED, 'true');
+
     // Pre-warm microphone permission during transition to eliminate first-recording lag
     this.audioRecorder.initMic().then(() => {
       if (this.audioRecorder.stream) {
@@ -617,6 +628,7 @@ class VoiceCollectorApp {
   }
 
   showHomeView() {
+    document.documentElement.classList.add('setup-completed');
     if (this.dom.setupPage) {
       this.dom.setupPage.classList.add('hidden');
     }
@@ -634,6 +646,7 @@ class VoiceCollectorApp {
   }
 
   showSetupView() {
+    document.documentElement.classList.remove('setup-completed');
     if (this.dom.mainHomeView) {
       this.dom.mainHomeView.classList.add('hidden');
     }
