@@ -32,9 +32,9 @@ export const translations = {
     readmeStep4: "4. 全ての録音が完了したら、右上の「📦 ZIP保存」を押してダウンロードします。",
     readmeSubmissionTitle: "【メール送信】",
     readmeSubmissionDesc: "ZIP保存後、下のボタンからメールを起動してファイルを送付できます。",
-    emailSubmitBtn: "✉️ メールで送付（ynagasawa@spacetime-eng.com）",
+    emailSubmitBtn: "✉️ メールで送る（ynagasawa@spacetime-eng.com）",
     zipExportDialogTitle: "ZIP保存完了",
-    zipExportDialogDesc: "ZIPファイルの保存が完了しました。下のボタンからメールを起動し、ファイルを添付して送信してください。",
+    zipExportDialogDesc: "ZIPファイルを作成しました。下のボタンからメールアプリを起動して送信できます（スマホ等ではZIPファイルが自動添付された状態で開きます）。",
     readmeCloseBtn: "閉じる",
 
     // Setup Pre-Page
@@ -145,7 +145,7 @@ export const translations = {
     readmeSubmissionDesc: "After saving your ZIP, tap below to open your email client and send files to ynagasawa@spacetime-eng.com.",
     emailSubmitBtn: "✉️ Send via Email (ynagasawa@spacetime-eng.com)",
     zipExportDialogTitle: "ZIP Exported Successfully",
-    zipExportDialogDesc: "Your ZIP dataset has been saved. Tap below to launch your email client, attach the file, and send.",
+    zipExportDialogDesc: "ZIP dataset created. Tap below to share/email directly (ZIP file will be automatically attached on mobile).",
     readmeCloseBtn: "Close",
 
     // Setup Pre-Page
@@ -256,7 +256,7 @@ export const translations = {
     readmeSubmissionDesc: "หลังจากบันทึก ZIP กดปุ่มด้านล่างเพื่อเปิดอีเมลและส่งไฟล์ไปยัง ynagasawa@spacetime-eng.com",
     emailSubmitBtn: "✉️ ส่งผ่านอีเมล (ynagasawa@spacetime-eng.com)",
     zipExportDialogTitle: "บันทึก ZIP เรียบร้อยแล้ว",
-    zipExportDialogDesc: "ไฟล์ชุดข้อมูล ZIP ถูกบันทึกแล้ว กดปุ่มด้านล่างเพื่อเปิดอีเมล แนบไฟล์และส่งได้ทันที",
+    zipExportDialogDesc: "สร้างไฟล์ชุดข้อมูล ZIP เรียบร้อยแล้ว กดปุ่มด้านล่างเพื่อเปิดอีเมลและส่งได้ทันที (ไฟล์ ZIP จะถูกแนบโดยอัตโนมัติบนมือถือ)",
     readmeCloseBtn: "ปิด",
 
     // Setup Pre-Page

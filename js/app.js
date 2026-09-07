@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.3';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.3';
-import { AudioRecorder } from './audio_recorder.js?v=2.3';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.3';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.3';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.4';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.4';
+import { AudioRecorder } from './audio_recorder.js?v=2.4';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.4';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.4';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -29,6 +29,7 @@ class VoiceCollectorApp {
     this.activeAudioElement = null;
     this.currentGender = null; // 'male' | 'female' | null
     this.currentView = 'setup'; // 'setup' | 'home'
+    this.lastExportedZip = null;
 
     this.deviceInfo = this._getDeviceInfo();
   }
@@ -869,6 +870,7 @@ class VoiceCollectorApp {
     try {
       this.showToast(t('exportingZip'));
       const { blob, filename } = await exportDatasetZip();
+      this.lastExportedZip = { blob, filename };
       triggerBlobDownload(blob, filename);
       this.showToast(`📦 ${filename} をダウンロードしました！`);
       setTimeout(() => {
@@ -898,21 +900,49 @@ class VoiceCollectorApp {
     return { speaker: rawSpeaker, speakerWithGender, note, count, formattedDate, emailTo };
   }
 
-  submitViaEmail() {
+  async submitViaEmail() {
     const info = this._getSubmissionInfo();
-    const subject = encodeURIComponent(`【録音データ】VoiceCollector - ${info.speakerWithGender}`);
-    const body = encodeURIComponent(
-`VoiceCollectorで録音した音声データを共有します。
+    const subject = `【録音データ】VoiceCollector - ${info.speakerWithGender}`;
+    const bodyPlain = `VoiceCollectorで録音した音声データを共有します。
 
 【録音情報】
+・宛先：${info.emailTo}
 ・話者名：${info.speakerWithGender}
 ・備考：${info.note}
 ・録音件数：${info.count}件
 ・データ作成日時：${info.formattedDate}
 
-録音データのZIPファイルを添付しています。`
-    );
-    const mailto = `mailto:${info.emailTo}?subject=${subject}&body=${body}`;
+録音データのZIPファイルを添付しています。`;
+
+    // 1. If Web Share API is supported with file sharing (iOS Safari, Android Chrome, Mac/Windows)
+    if (this.lastExportedZip && navigator.canShare) {
+      try {
+        const file = new File([this.lastExportedZip.blob], this.lastExportedZip.filename, {
+          type: 'application/zip',
+          lastModified: Date.now()
+        });
+
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: subject,
+            text: bodyPlain,
+            files: [file]
+          });
+          return;
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          // User dismissed the share sheet
+          return;
+        }
+        console.warn("navigator.share with files fallback to mailto", err);
+      }
+    }
+
+    // 2. Fallback: mailto URL scheme
+    const subjectEncoded = encodeURIComponent(subject);
+    const bodyEncoded = encodeURIComponent(bodyPlain);
+    const mailto = `mailto:${info.emailTo}?subject=${subjectEncoded}&body=${bodyEncoded}`;
     window.location.href = mailto;
   }
 
