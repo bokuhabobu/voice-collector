@@ -56,7 +56,7 @@ git push -u origin main
 3. **Build and deployment** の設定：
    * **方法 A（推奨・自動CI/CD）**: `Source` を **[GitHub Actions]** に変更します。同梱の `.github/workflows/deploy.yml` により自動的にビルド・デプロイされます。
    * **方法 B（シンプル）**: `Source` を **[Deploy from a branch]** のまま、`Branch` を **`main`**、フォルダを **`/ (root)`** に指定して **[Save]** を押します。
-4. 1〜2分後、画面上部に発行された **公開HTTPS URL**（例: `https://<ユーザー名>.github.io/<リポジトリ名>/`）が表示されます。
+4. 1〜2分後、画面上部に発行された **公開HTTPS URL**（`https://bokuhabobu.github.io/voice-collector/`）が表示されます。
 
 ---
 
@@ -85,7 +85,7 @@ npx serve .
 
 【録音の手順（所要時間：約3分）】
 1. 以下のURLをスマートフォンのブラウザ（Safari / Chrome）で開きます。
-   👉 https://<ユーザー名>.github.io/<リポジトリ名>/
+   👉 https://bokuhabobu.github.io/voice-collector/
 2. 最初の画面でお名前（例: 田中 太郎）を入力し、「性別（男性/女性）」を選択して「録音画面へ進む」を押します。
 3. スクリプト言語（日本語/英語/タイ語）を選び、画面の文章を読み上げながら「録音開始」を押します。
 4. 読み終わったら「停止」を押し、「✓ 保存して次の文へ」を押します。
