@@ -22,7 +22,8 @@
         <h1 class="brand-title" data-i18n="appTitle">VoiceCollector</h1>
       </div>
 
-      <div class="header-actions">
+      <!-- Desktop Header Actions (hidden on mobile <= 680px) -->
+      <div class="header-actions desktop-header-actions">
         <!-- Language Switcher -->
         <select id="langSelect" class="lang-dropdown" aria-label="Select Language">
           <option value="ja">🇯🇵 日本語</option>
@@ -53,8 +54,67 @@
           🌓
         </button>
       </div>
+
+      <!-- Mobile Hamburger Button (visible on mobile <= 680px) -->
+      <div class="mobile-header-actions">
+        <button id="mobileMenuToggleBtn" type="button" class="btn-hamburger" aria-label="Open Menu" title="メニューを開く">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
     </div>
   </header>
+
+  <!-- Mobile Slide-out Menu Drawer -->
+  <div id="mobileMenuDrawer" class="mobile-menu-drawer hidden" aria-hidden="true">
+    <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+    <div class="mobile-menu-content">
+      <div class="mobile-menu-header">
+        <h3 class="mobile-menu-title" data-i18n="mobileMenuTitle">メニュー</h3>
+        <button id="closeMobileMenuBtn" type="button" class="btn-close-menu" aria-label="Close Menu">✕</button>
+      </div>
+      <div class="mobile-menu-body">
+        <!-- Language Selector -->
+        <div class="mobile-menu-item">
+          <label class="mobile-item-label" data-i18n="langSelect">言語</label>
+          <select id="mobileLangSelect" class="lang-dropdown" style="width: 100%;" aria-label="Select Language">
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="th">🇹🇭 ภาษาไทย</option>
+          </select>
+        </div>
+
+        <!-- Action Items (Home View Only) -->
+        <div id="mobileHomeMenuItems" class="mobile-home-menu-items">
+          <button id="mobileViewListBtn" type="button" class="mobile-menu-btn">
+            <span>💾 <span data-i18n="viewListBtn">録音リスト</span></span>
+            <span id="mobileSavedCountBadge" class="mobile-badge">0 件</span>
+          </button>
+
+          <button id="mobileExportZipBtn" type="button" class="mobile-menu-btn btn-primary-tint">
+            <span>📦 <span data-i18n="exportZipBtn">ZIP保存</span></span>
+            <span>→</span>
+          </button>
+
+          <button id="mobileReadmeBtn" type="button" class="mobile-menu-btn">
+            <span>📖 <span data-i18n="readmeBtn">README</span></span>
+            <span>ℹ️</span>
+          </button>
+
+          <button id="mobileEditProfileBtn" type="button" class="mobile-menu-btn">
+            <span>✏️ <span data-i18n="backToSetupBtn">プロフィール変更</span></span>
+            <span>⚙️</span>
+          </button>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="mobileThemeToggleBtn" type="button" class="mobile-menu-btn">
+          <span>🌓 <span data-i18n="themeToggle">テーマ切替</span></span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- View 1: Setup Pre-Page (Before Home) -->
   <section id="setupPage" class="setup-page-view" aria-label="Speaker Profile Setup">
@@ -262,7 +322,28 @@
 
       <!-- Reviewing & Next Controls (Hidden initially) -->
       <div id="reviewControls" class="review-controls hidden">
-        <audio id="audioPreviewPlayer" class="preview-audio-player" controls></audio>
+        <!-- Touch-Friendly Custom Preview Player Card -->
+        <div class="custom-audio-player-card">
+          <button id="customPlayBtn" type="button" class="btn-custom-play" aria-label="Play / Pause" title="再生 / 一時停止">
+            <span id="customPlayIcon" class="custom-play-icon">▶</span>
+          </button>
+          <div class="player-timeline-group">
+            <div class="player-time-row">
+              <span id="playerStatusLabel" class="player-status-label" data-i18n="previewAudio">聞き直し（プレビュー）</span>
+              <div class="player-time-numbers">
+                <span id="playerCurrentTime" class="player-time-text">0.0s</span>
+                <span class="player-time-divider">/</span>
+                <span id="playerTotalTime" class="player-time-text">0.0s</span>
+              </div>
+            </div>
+            <div id="playerProgressContainer" class="player-progress-bar-bg" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div id="playerProgressBar" class="player-progress-fill"></div>
+            </div>
+          </div>
+          <!-- Native audio element (hidden, handles media buffering with playsinline) -->
+          <audio id="audioPreviewPlayer" class="hidden-native-audio" playsinline webkit-playsinline preload="auto"></audio>
+        </div>
+
         <div class="review-btn-row">
           <button id="reRecordBtn" type="button" class="btn btn-rerecord" data-i18n="reRecordBtn">
             ↺ もう一度録り直す
@@ -401,6 +482,6 @@
 
   <!-- Scripts -->
   <script src="lib/jszip.min.js"></script>
-  <script type="module" src="js/app.js?v=2.2"></script>
+  <script type="module" src="js/app.js?v=2.3"></script>
 </body>
 </html>

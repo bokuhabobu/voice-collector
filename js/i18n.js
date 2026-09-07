@@ -16,6 +16,10 @@ export const translations = {
     exportZipBtn: "📦 ZIP保存",
     viewListBtn: "録音リスト",
     readmeBtn: "📖 README",
+    mobileMenuTitle: "メニュー",
+    menuCloseBtn: "閉じる",
+    playPreview: "再生",
+    pausePreview: "一時停止",
 
     // README Modal
     readmeModalTitle: "VoiceCollector - 概要と利用手順",
@@ -123,6 +127,10 @@ export const translations = {
     exportZipBtn: "📦 Export ZIP",
     viewListBtn: "Recordings",
     readmeBtn: "📖 README",
+    mobileMenuTitle: "Menu",
+    menuCloseBtn: "Close",
+    playPreview: "Play",
+    pausePreview: "Pause",
 
     // README Modal
     readmeModalTitle: "VoiceCollector - Overview & Guide",
@@ -230,6 +238,10 @@ export const translations = {
     exportZipBtn: "📦 บันทึก ZIP",
     viewListBtn: "รายการเสียง",
     readmeBtn: "📖 README",
+    mobileMenuTitle: "เมนู",
+    menuCloseBtn: "ปิด",
+    playPreview: "เล่น",
+    pausePreview: "หยุดชั่วคราว",
 
     // README Modal
     readmeModalTitle: "VoiceCollector - ภาพรวมและวิธีใช้งาน",

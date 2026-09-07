@@ -30,7 +30,12 @@ export class AudioRecorder {
   }
 
   async initMic() {
-    if (this.stream) return true;
+    if (this.stream && this.stream.active) {
+      const tracks = this.stream.getAudioTracks();
+      if (tracks.length > 0 && tracks[0].readyState === 'live') {
+        return true;
+      }
+    }
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -84,8 +89,12 @@ export class AudioRecorder {
       this.pcmDataBuffers.push(new Float32Array(inputBuffer));
     };
 
+    // Connect nodes via a zero-gain mute node to prevent live mic feedback & OS howling suppression
     this.sourceNode.connect(this.processorNode);
-    this.processorNode.connect(this.audioCtx.destination);
+    const muteGain = this.audioCtx.createGain();
+    muteGain.gain.setValueAtTime(0, this.audioCtx.currentTime);
+    this.processorNode.connect(muteGain);
+    muteGain.connect(this.audioCtx.destination);
 
     // Start timer
     if (onTimerUpdate) {
@@ -133,6 +142,17 @@ export class AudioRecorder {
         }
       } catch (e) {
         console.warn("Disconnect error", e);
+      }
+
+      // CRITICAL FOR MOBILE: Stop microphone tracks so smartphone OS immediately switches out of
+      // phone-call receiver mode back to loud media speaker mode!
+      if (this.stream) {
+        try {
+          this.stream.getTracks().forEach(t => t.stop());
+        } catch (e) {
+          console.warn("Error stopping stream tracks", e);
+        }
+        this.stream = null;
       }
 
       const inputSampleRate = this.audioCtx ? this.audioCtx.sampleRate : 48000;

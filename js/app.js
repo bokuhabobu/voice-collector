@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.2';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.2';
-import { AudioRecorder } from './audio_recorder.js?v=2.2';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.2';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.2';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.3';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.3';
+import { AudioRecorder } from './audio_recorder.js?v=2.3';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.3';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.3';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -122,6 +122,28 @@ class VoiceCollectorApp {
       closeSubmitModalBtn: document.getElementById('closeSubmitModalBtn'),
       closeSubmitFooterBtn: document.getElementById('closeSubmitFooterBtn'),
       submitViaEmailBtn: document.getElementById('submitViaEmailBtn'),
+
+      // Mobile Drawer & Hamburger
+      mobileMenuToggleBtn: document.getElementById('mobileMenuToggleBtn'),
+      mobileMenuDrawer: document.getElementById('mobileMenuDrawer'),
+      mobileMenuBackdrop: document.getElementById('mobileMenuBackdrop'),
+      closeMobileMenuBtn: document.getElementById('closeMobileMenuBtn'),
+      mobileLangSelect: document.getElementById('mobileLangSelect'),
+      mobileHomeMenuItems: document.getElementById('mobileHomeMenuItems'),
+      mobileViewListBtn: document.getElementById('mobileViewListBtn'),
+      mobileSavedCountBadge: document.getElementById('mobileSavedCountBadge'),
+      mobileExportZipBtn: document.getElementById('mobileExportZipBtn'),
+      mobileReadmeBtn: document.getElementById('mobileReadmeBtn'),
+      mobileEditProfileBtn: document.getElementById('mobileEditProfileBtn'),
+      mobileThemeToggleBtn: document.getElementById('mobileThemeToggleBtn'),
+
+      // Custom Touch-Friendly Audio Player
+      customPlayBtn: document.getElementById('customPlayBtn'),
+      customPlayIcon: document.getElementById('customPlayIcon'),
+      playerProgressContainer: document.getElementById('playerProgressContainer'),
+      playerProgressBar: document.getElementById('playerProgressBar'),
+      playerCurrentTime: document.getElementById('playerCurrentTime'),
+      playerTotalTime: document.getElementById('playerTotalTime'),
 
       // Toast / Notification
       toast: document.getElementById('toast')
@@ -263,13 +285,77 @@ class VoiceCollectorApp {
       this.dom.backToSetupBtn.addEventListener('click', () => this.showSetupView());
     }
 
-    // UI Language change
+    // UI Language change (Desktop)
     this.dom.langSelect.value = getLanguage();
     this.dom.langSelect.addEventListener('change', (e) => {
       setLanguage(e.target.value);
+      if (this.dom.mobileLangSelect) this.dom.mobileLangSelect.value = e.target.value;
     });
 
+    // UI Language change (Mobile Menu)
+    if (this.dom.mobileLangSelect) {
+      this.dom.mobileLangSelect.value = getLanguage();
+      this.dom.mobileLangSelect.addEventListener('change', (e) => {
+        setLanguage(e.target.value);
+        if (this.dom.langSelect) this.dom.langSelect.value = e.target.value;
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+      });
+    }
+
+    // Mobile Hamburger Menu Drawer Toggles
+    if (this.dom.mobileMenuToggleBtn) {
+      this.dom.mobileMenuToggleBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) {
+          this.dom.mobileMenuDrawer.classList.toggle('hidden');
+        }
+      });
+    }
+    if (this.dom.closeMobileMenuBtn) {
+      this.dom.closeMobileMenuBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+      });
+    }
+    if (this.dom.mobileMenuBackdrop) {
+      this.dom.mobileMenuBackdrop.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+      });
+    }
+
+    // Mobile Menu Action Buttons
+    if (this.dom.mobileViewListBtn) {
+      this.dom.mobileViewListBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+        this.openRecordingsModal();
+      });
+    }
+    if (this.dom.mobileExportZipBtn) {
+      this.dom.mobileExportZipBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+        this.handleExportZip();
+      });
+    }
+    if (this.dom.mobileReadmeBtn) {
+      this.dom.mobileReadmeBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+        this.openReadmeModal();
+      });
+    }
+    if (this.dom.mobileEditProfileBtn) {
+      this.dom.mobileEditProfileBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+        this.showSetupView();
+      });
+    }
+    if (this.dom.mobileThemeToggleBtn) {
+      this.dom.mobileThemeToggleBtn.addEventListener('click', () => {
+        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+        this._toggleTheme();
+      });
+    }
+
     window.addEventListener('languageChanged', () => {
+      if (this.dom.langSelect) this.dom.langSelect.value = getLanguage();
+      if (this.dom.mobileLangSelect) this.dom.mobileLangSelect.value = getLanguage();
       this._updateCategoryDropdownOptions();
       this.renderCurrentScript();
       this.updateRecordedStatus();
@@ -332,6 +418,72 @@ class VoiceCollectorApp {
     this.dom.stopBtn.addEventListener('click', () => this.stopRecording());
     this.dom.reRecordBtn.addEventListener('click', () => this.cancelReviewAndRerecord());
     this.dom.saveAndNextBtn.addEventListener('click', () => this.saveCurrentTakeAndAdvance());
+
+    // Custom Audio Preview Player Controls
+    if (this.dom.customPlayBtn) {
+      this.dom.customPlayBtn.addEventListener('click', () => this.togglePreviewAudio());
+    }
+
+    if (this.dom.audioPreviewPlayer) {
+      this.dom.audioPreviewPlayer.addEventListener('timeupdate', () => {
+        const cur = this.dom.audioPreviewPlayer.currentTime || 0;
+        const dur = this.dom.audioPreviewPlayer.duration || (this.currentTake ? this.currentTake.durationSec : 0);
+        if (this.dom.playerCurrentTime) {
+          this.dom.playerCurrentTime.textContent = `${cur.toFixed(1)}s`;
+        }
+        if (this.dom.playerProgressBar && dur > 0) {
+          const pct = Math.min(100, (cur / dur) * 100);
+          this.dom.playerProgressBar.style.width = `${pct}%`;
+        }
+      });
+
+      this.dom.audioPreviewPlayer.addEventListener('ended', () => {
+        if (this.dom.customPlayIcon) {
+          this.dom.customPlayIcon.textContent = '▶';
+          this.dom.customPlayIcon.classList.remove('playing');
+        }
+        if (this.dom.playerProgressBar) {
+          this.dom.playerProgressBar.style.width = '0%';
+        }
+        if (this.dom.playerCurrentTime) {
+          this.dom.playerCurrentTime.textContent = '0.0s';
+        }
+      });
+
+      this.dom.audioPreviewPlayer.addEventListener('pause', () => {
+        if (this.dom.customPlayIcon) {
+          this.dom.customPlayIcon.textContent = '▶';
+          this.dom.customPlayIcon.classList.remove('playing');
+        }
+      });
+
+      this.dom.audioPreviewPlayer.addEventListener('play', () => {
+        if (this.dom.customPlayIcon) {
+          this.dom.customPlayIcon.textContent = '⏸';
+          this.dom.customPlayIcon.classList.add('playing');
+        }
+      });
+    }
+
+    if (this.dom.playerProgressContainer) {
+      this.dom.playerProgressContainer.addEventListener('click', (e) => {
+        if (!this.dom.audioPreviewPlayer) return;
+        const rect = this.dom.playerProgressContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const width = rect.width;
+        const dur = this.dom.audioPreviewPlayer.duration || (this.currentTake ? this.currentTake.durationSec : 0);
+        if (dur > 0 && width > 0) {
+          const seekTime = (clickX / width) * dur;
+          this.dom.audioPreviewPlayer.currentTime = seekTime;
+          if (this.dom.playerCurrentTime) {
+            this.dom.playerCurrentTime.textContent = `${seekTime.toFixed(1)}s`;
+          }
+          if (this.dom.playerProgressBar) {
+            this.dom.playerProgressBar.style.width = `${(clickX / width) * 100}%`;
+          }
+        }
+      });
+    }
 
     // Export ZIP
     this.dom.exportZipBtn.addEventListener('click', () => this.handleExportZip());
@@ -438,6 +590,14 @@ class VoiceCollectorApp {
       localStorage.setItem(STORAGE_KEY_SPEAKER, defaultName);
     }
 
+    // Pre-warm microphone permission during transition to eliminate first-recording lag
+    this.audioRecorder.initMic().then(() => {
+      if (this.audioRecorder.stream) {
+        this.audioRecorder.stream.getTracks().forEach(t => t.stop());
+        this.audioRecorder.stream = null;
+      }
+    }).catch(e => console.warn("Mic prewarm:", e));
+
     this.showHomeView();
   }
 
@@ -450,6 +610,9 @@ class VoiceCollectorApp {
     }
     if (this.dom.homeHeaderActions) {
       this.dom.homeHeaderActions.classList.remove('hidden');
+    }
+    if (this.dom.mobileHomeMenuItems) {
+      this.dom.mobileHomeMenuItems.classList.remove('hidden');
     }
     this.currentView = 'home';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -464,6 +627,9 @@ class VoiceCollectorApp {
     }
     if (this.dom.homeHeaderActions) {
       this.dom.homeHeaderActions.classList.add('hidden');
+    }
+    if (this.dom.mobileHomeMenuItems) {
+      this.dom.mobileHomeMenuItems.classList.add('hidden');
     }
     this.currentView = 'setup';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -486,7 +652,12 @@ class VoiceCollectorApp {
   async updateRecordedStatus() {
     this.recordedMap = await getRecordedMap();
     const count = Object.keys(this.recordedMap).length;
-    this.dom.savedCountBadge.textContent = `${count} ${t('recordingsCount')}`;
+    if (this.dom.savedCountBadge) {
+      this.dom.savedCountBadge.textContent = `${count} ${t('recordingsCount')}`;
+    }
+    if (this.dom.mobileSavedCountBadge) {
+      this.dom.mobileSavedCountBadge.textContent = `${count} 件`;
+    }
   }
 
   renderCurrentScript() {
@@ -583,19 +754,68 @@ class VoiceCollectorApp {
     }
     this.currentAudioUrl = URL.createObjectURL(result.blob);
     this.dom.audioPreviewPlayer.src = this.currentAudioUrl;
+    this.dom.audioPreviewPlayer.load(); // Forces media pipeline readiness on mobile browsers
+
+    if (this.dom.playerTotalTime) {
+      this.dom.playerTotalTime.textContent = `${result.durationSec.toFixed(1)}s`;
+    }
+    if (this.dom.playerCurrentTime) {
+      this.dom.playerCurrentTime.textContent = '0.0s';
+    }
+    if (this.dom.playerProgressBar) {
+      this.dom.playerProgressBar.style.width = '0%';
+    }
+    if (this.dom.customPlayIcon) {
+      this.dom.customPlayIcon.textContent = '▶';
+      this.dom.customPlayIcon.classList.remove('playing');
+    }
 
     // Show review controls
     this.dom.reviewControls.classList.remove('hidden');
     this.dom.reviewControls.classList.add('active');
   }
 
+  togglePreviewAudio() {
+    if (!this.dom.audioPreviewPlayer || !this.currentAudioUrl) return;
+
+    if (this.dom.audioPreviewPlayer.paused) {
+      this.dom.audioPreviewPlayer.play().then(() => {
+        if (this.dom.customPlayIcon) {
+          this.dom.customPlayIcon.textContent = '⏸';
+          this.dom.customPlayIcon.classList.add('playing');
+        }
+      }).catch(e => {
+        console.warn("Audio play error", e);
+      });
+    } else {
+      this.dom.audioPreviewPlayer.pause();
+      if (this.dom.customPlayIcon) {
+        this.dom.customPlayIcon.textContent = '▶';
+        this.dom.customPlayIcon.classList.remove('playing');
+      }
+    }
+  }
+
   cancelReviewAndRerecord() {
+    if (this.dom.audioPreviewPlayer) {
+      this.dom.audioPreviewPlayer.pause();
+      this.dom.audioPreviewPlayer.src = '';
+    }
     if (this.currentAudioUrl) {
       URL.revokeObjectURL(this.currentAudioUrl);
       this.currentAudioUrl = null;
     }
     this.currentTake = null;
-    this.dom.audioPreviewPlayer.src = '';
+    if (this.dom.customPlayIcon) {
+      this.dom.customPlayIcon.textContent = '▶';
+      this.dom.customPlayIcon.classList.remove('playing');
+    }
+    if (this.dom.playerProgressBar) {
+      this.dom.playerProgressBar.style.width = '0%';
+    }
+    if (this.dom.playerCurrentTime) {
+      this.dom.playerCurrentTime.textContent = '0.0s';
+    }
     this.dom.reviewControls.classList.remove('active');
     this.dom.reviewControls.classList.add('hidden');
     this.dom.recordBtn.classList.remove('hidden');
