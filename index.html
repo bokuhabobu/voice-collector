@@ -58,12 +58,8 @@
             📖 README
           </button>
         </div>
-
-        <!-- Dark/Light Theme Toggle -->
-        <button id="themeToggleBtn" type="button" class="btn btn-outline btn-sm" aria-label="Toggle Theme" title="テーマ切替">
-          🌓
-        </button>
       </div>
+
 
       <!-- Mobile Hamburger Button (visible on mobile <= 680px) -->
       <div class="mobile-header-actions">
@@ -117,13 +113,9 @@
             <span>⚙️</span>
           </button>
         </div>
-
-        <!-- Theme Toggle -->
-        <button id="mobileThemeToggleBtn" type="button" class="mobile-menu-btn">
-          <span>🌓 <span data-i18n="themeToggle">テーマ切替</span></span>
-        </button>
       </div>
     </div>
+
   </div>
 
   <!-- View 1: Setup Pre-Page (Before Home) -->
@@ -191,47 +183,63 @@
   <!-- View 2: Main Recording Home Container -->
   <main id="mainHomeView" class="main-container hidden">
 
-    <!-- Section 1: Basic Info (Speaker & Gender Summary) -->
-    <section class="glass-card" aria-labelledby="metaHeading">
-      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <h2 id="metaHeading" class="card-title">
-          <span>🏷️</span>
-          <span data-i18n="metaSectionTitle">1. 基本情報</span>
-        </h2>
-        <button id="backToSetupBtn" type="button" class="btn btn-outline btn-sm" data-i18n="backToSetupBtn" title="話者名・性別を変更する">
-          ✏️ プロフィール変更
-        </button>
-      </div>
+    <!-- Section 1: Basic Info (Collapsible Compact Summary) -->
+    <details id="metaSectionDetails" class="glass-card meta-details-card" aria-labelledby="metaHeading">
+      <summary class="meta-details-summary">
+        <div class="meta-summary-left">
+          <span class="meta-icon">🏷️</span>
+          <span class="meta-summary-text">
+            <span class="meta-summary-title" data-i18n="metaSectionTitle">基本情報</span>:
+            <strong id="metaSummarySpeaker">未設定</strong>
+            <span id="metaSummaryGender" class="meta-summary-badge">-</span>
+          </span>
+        </div>
+        <div class="meta-summary-right">
+          <span class="meta-toggle-hint" data-i18n="editProfileHint">変更 ▼</span>
+        </div>
+      </summary>
 
-      <div class="meta-grid">
-        <!-- Speaker Input (Auto Persisted) -->
-        <div class="input-field-group">
-          <label for="speakerInput" class="input-label" data-i18n="speakerLabel">お名前</label>
-          <input type="text" id="speakerInput" class="text-input" data-i18n-placeholder="speakerPlaceholder" placeholder="例: 田中 太郎">
+      <div class="meta-details-expanded-body">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 0.75rem;">
+          <h2 id="metaHeading" class="card-title">
+            <span>🏷️</span>
+            <span data-i18n="metaSectionTitle">1. 基本情報</span>
+          </h2>
+          <button id="backToSetupBtn" type="button" class="btn btn-outline btn-sm" data-i18n="backToSetupBtn" title="話者名・性別を変更する">
+            ✏️ プロフィール変更
+          </button>
         </div>
 
-        <!-- Gender Chip Selection in Home -->
-        <div class="input-field-group">
-          <label class="input-label" data-i18n="genderLabel">性別</label>
-          <div class="gender-selector-group gender-selector-compact" role="radiogroup">
-            <button type="button" id="homeGenderMaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="male">
-              <span class="gender-chip-icon">👨</span>
-              <span class="gender-chip-text" data-i18n="genderMale">男性</span>
-            </button>
-            <button type="button" id="homeGenderFemaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="female">
-              <span class="gender-chip-icon">👩</span>
-              <span class="gender-chip-text" data-i18n="genderFemale">女性</span>
-            </button>
+        <div class="meta-grid">
+          <!-- Speaker Input (Auto Persisted) -->
+          <div class="input-field-group">
+            <label for="speakerInput" class="input-label" data-i18n="speakerLabel">お名前</label>
+            <input type="text" id="speakerInput" class="text-input" data-i18n-placeholder="speakerPlaceholder" placeholder="例: 田中 太郎">
+          </div>
+
+          <!-- Gender Chip Selection in Home -->
+          <div class="input-field-group">
+            <label class="input-label" data-i18n="genderLabel">性別</label>
+            <div class="gender-selector-group gender-selector-compact" role="radiogroup">
+              <button type="button" id="homeGenderMaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="male">
+                <span class="gender-chip-icon">👨</span>
+                <span class="gender-chip-text" data-i18n="genderMale">男性</span>
+              </button>
+              <button type="button" id="homeGenderFemaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="female">
+                <span class="gender-chip-icon">👩</span>
+                <span class="gender-chip-text" data-i18n="genderFemale">女性</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Note Input (Auto Persisted) -->
+          <div class="input-field-group" style="grid-column: 1 / -1;">
+            <label for="customNoteInput" class="input-label" data-i18n="customNoteLabel">備考・補足</label>
+            <input type="text" id="customNoteInput" class="text-input" data-i18n-placeholder="customNotePlaceholder" placeholder="例: エアコン直下、早口、小声、マスク着用など">
           </div>
         </div>
-
-        <!-- Custom Note Input (Auto Persisted) -->
-        <div class="input-field-group" style="grid-column: 1 / -1;">
-          <label for="customNoteInput" class="input-label" data-i18n="customNoteLabel">備考・補足</label>
-          <input type="text" id="customNoteInput" class="text-input" data-i18n-placeholder="customNotePlaceholder" placeholder="例: エアコン直下、早口、小声、マスク着用など">
-        </div>
       </div>
-    </section>
+    </details>
 
     <!-- Section 2: Script Prompter Hero -->
     <section class="glass-card prompter-card" aria-labelledby="scriptHeading">
@@ -285,7 +293,7 @@
       </div>
 
       <!-- Large Prompter Box (Max size font-xlarge) -->
-      <div class="script-display-box">
+      <div id="scriptDisplayBox" class="script-display-box">
         <p id="scriptDisplayArea" class="script-text font-xlarge">
           これから音声認識テストをはじめます。
         </p>

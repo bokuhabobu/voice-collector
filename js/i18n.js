@@ -10,7 +10,6 @@ export const translations = {
     
     // Header & Controls
     langSelect: "言語",
-    themeToggle: "テーマ切替",
     storageStatus: "保存済み",
     recordingsCount: "件の録音",
     exportZipBtn: "📦 ZIP保存",
@@ -50,6 +49,7 @@ export const translations = {
 
     // Speaker Section
     metaSectionTitle: "1. 基本情報",
+    editProfileHint: "変更・詳細 ▼",
     speakerLabel: "お名前",
     speakerPlaceholder: "例: 田中 太郎",
     customNoteLabel: "備考・補足",
@@ -122,7 +122,6 @@ export const translations = {
     
     // Header & Controls
     langSelect: "Language",
-    themeToggle: "Theme",
     storageStatus: "Saved",
     recordingsCount: "takes",
     exportZipBtn: "📦 Export ZIP",
@@ -162,6 +161,7 @@ export const translations = {
 
     // Speaker Section
     metaSectionTitle: "1. Basic Info",
+    editProfileHint: "Edit ▼",
     speakerLabel: "Your Name",
     speakerPlaceholder: "e.g., Taro Tanaka",
     customNoteLabel: "Notes / Details",
@@ -234,7 +234,6 @@ export const translations = {
     
     // Header & Controls
     langSelect: "ภาษา (Language)",
-    themeToggle: "ธีม",
     storageStatus: "บันทึกแล้ว",
     recordingsCount: "ไฟล์",
     exportZipBtn: "📦 บันทึก ZIP",
@@ -274,6 +273,7 @@ export const translations = {
 
     // Speaker Section
     metaSectionTitle: "1. ข้อมูลพื้นฐาน",
+    editProfileHint: "แก้ไข ▼",
     speakerLabel: "ชื่อ-นามสกุล",
     speakerPlaceholder: "เช่น สมชาย ใจดี",
     customNoteLabel: "หมายเหตุเพิ่มเติม",

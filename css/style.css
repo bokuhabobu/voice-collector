@@ -46,22 +46,6 @@
   --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="dark"] {
-  --bg-main: hsl(222, 47%, 9%);
-  --bg-card: hsla(220, 39%, 14%, 0.85);
-  --bg-card-hover: hsla(220, 39%, 18%, 0.95);
-  --bg-subtle: hsla(220, 30%, 20%, 0.6);
-  --border-card: hsla(220, 25%, 35%, 0.3);
-
-  --text-main: hsl(210, 40%, 98%);
-  --text-muted: hsl(215, 20%, 65%);
-  --text-inverse: hsl(222, 47%, 9%);
-
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
-}
-
 /* ==========================================================================
    Base & Reset
    ========================================================================== */
@@ -108,10 +92,6 @@ button, input, select, textarea {
   border-bottom: 1px solid var(--border-card);
   padding: 0.8rem 1.25rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="dark"] .app-header {
-  background: hsla(222, 47%, 9%, 0.85);
 }
 
 .header-inner {
@@ -307,8 +287,92 @@ html.setup-completed #mobileHomeMenuItems {
 }
 
 /* ==========================================================================
-   Section 1: Speaker & Noise Level
+   Section 1: Collapsible Speaker Info Card
    ========================================================================== */
+.meta-details-card {
+  padding: 0.75rem 1.25rem;
+  transition: padding 0.2s ease, box-shadow var(--transition-fast);
+}
+
+.meta-details-card[open] {
+  padding: 1.25rem 1.5rem;
+}
+
+.meta-details-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  outline: none;
+}
+
+.meta-details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.meta-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.meta-summary-left .meta-icon {
+  font-size: 1.1rem;
+}
+
+.meta-summary-title {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.meta-summary-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 0.35rem;
+}
+
+.meta-summary-right {
+  display: flex;
+  align-items: center;
+}
+
+.meta-toggle-hint {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: hsla(220, 84%, 58%, 0.08);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.meta-details-card[open] .meta-toggle-hint {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+}
+
+.meta-details-card summary:hover .meta-toggle-hint {
+  background: hsla(220, 84%, 58%, 0.15);
+}
+
+.meta-details-expanded-body {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-card);
+  animation: fadeIn 0.2s ease-out;
+}
+
 .meta-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -406,11 +470,6 @@ html.setup-completed #mobileHomeMenuItems {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="dark"] .btn-lang-tab.active {
-  background: var(--bg-card);
-  color: #ffffff;
-}
-
 .filter-group {
   display: flex;
   align-items: center;
@@ -493,12 +552,6 @@ html.setup-completed #mobileHomeMenuItems {
   color: hsl(217, 91%, 45%);
 }
 
-[data-theme="dark"] .btn-furigana-toggle.active {
-  background: hsla(217, 91%, 60%, 0.2);
-  border-color: hsla(217, 91%, 60%, 0.5);
-  color: hsl(217, 91%, 70%);
-}
-
 .btn-furigana-toggle .furigana-icon {
   display: inline-flex;
   align-items: center;
@@ -535,19 +588,27 @@ html.setup-completed #mobileHomeMenuItems {
 /* Prompt Text Area (Crisp & Legible) */
 .script-display-box {
   background: hsl(210, 30%, 97%);
-  border: 1px solid var(--border-card);
+  border: 1.5px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 2rem 1.5rem;
-  min-height: 160px;
+  padding: 1.5rem 1.25rem;
+  min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="dark"] .script-display-box {
-  background: hsla(220, 45%, 7%, 0.5);
+/* Focused Highlight during recording */
+body.is-recording .script-display-box {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-glow), var(--shadow-md);
+  background: hsla(352, 85%, 97%, 0.55);
+}
+
+body.is-recording .script-text {
+  color: hsl(222, 55%, 10%);
 }
 
 .script-text {
@@ -569,10 +630,6 @@ html.setup-completed #mobileHomeMenuItems {
   letter-spacing: -0.01em;
   line-height: 1;
   user-select: none;
-}
-
-[data-theme="dark"] .script-text rt {
-  color: hsl(217, 85%, 70%);
 }
 
 .font-normal { font-size: 1.15rem; }
@@ -617,30 +674,26 @@ html.setup-completed #mobileHomeMenuItems {
 
 .waveform-canvas {
   width: 100%;
-  height: 90px;
+  height: 56px;
   background: hsl(210, 30%, 96%);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
-  margin-bottom: 1rem;
-}
-
-[data-theme="dark"] .waveform-canvas {
-  background: rgba(15, 23, 42, 0.5);
+  margin-bottom: 0.65rem;
 }
 
 .record-timer {
   font-family: 'Outfit', monospace;
-  font-size: 2.2rem;
+  font-size: 1.95rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   color: var(--text-main);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.25rem;
 }
 
 .mic-status-text {
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
   font-weight: 500;
 }
 
@@ -692,10 +745,6 @@ html.setup-completed #mobileHomeMenuItems {
   font-size: 1.8rem;
   box-shadow: 0 8px 24px var(--danger-glow);
   transition: all var(--transition-fast);
-}
-
-[data-theme="dark"] .btn-big-stop {
-  background: #0f172a;
 }
 
 .pulse-recording {
@@ -864,10 +913,6 @@ html.setup-completed #mobileHomeMenuItems {
   flex-direction: column;
   box-shadow: var(--shadow-lg);
   animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-theme="dark"] .modal-content {
-  background: var(--bg-card);
 }
 
 .modal-header {
@@ -1294,10 +1339,6 @@ html.setup-completed #mobileHomeMenuItems {
   position: relative;
 }
 
-[data-theme="dark"] .player-progress-bar-bg {
-  background: hsla(220, 25%, 25%, 0.6);
-}
-
 .player-progress-fill {
   width: 0%;
   height: 100%;
@@ -1444,5 +1485,83 @@ html.setup-completed #mobileHomeMenuItems {
   font-size: 0.78rem;
   font-weight: 700;
 }
+
+/* ==========================================================================
+   Viewport Fit & Script Visibility Optimizations (Mobile / Compact Viewports)
+   ========================================================================== */
+@media (max-width: 680px) {
+  .main-container {
+    padding: 0.65rem 0.65rem 1.75rem 0.65rem;
+    gap: 0.65rem;
+  }
+
+  .glass-card {
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .meta-details-card {
+    padding: 0.6rem 0.85rem;
+  }
+
+  .meta-details-card[open] {
+    padding: 0.85rem 1rem;
+  }
+
+  .meta-summary-left {
+    font-size: 0.85rem;
+    gap: 0.4rem;
+  }
+
+  .prompter-top-bar {
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .script-meta-row {
+    margin-bottom: 0.5rem;
+  }
+
+  .script-display-box {
+    min-height: 95px;
+    padding: 1rem 0.75rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .waveform-canvas {
+    height: 42px;
+    margin-bottom: 0.4rem;
+  }
+
+  .record-timer {
+    font-size: 1.65rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .mic-status-text {
+    font-size: 0.78rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .btn-big-record,
+  .btn-big-stop {
+    width: 68px;
+    height: 68px;
+    font-size: 1.6rem;
+  }
+
+  .record-trigger-container {
+    margin-bottom: 0.4rem;
+  }
+
+  .card-header {
+    margin-bottom: 0.5rem;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+  }
+}
+
 
 

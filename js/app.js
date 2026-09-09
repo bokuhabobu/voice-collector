@@ -43,7 +43,6 @@ class VoiceCollectorApp {
     await initDB();
 
     this._cacheDOMElements();
-    this._initTheme();
     this._restorePersistedInputs();
     this._bindEvents();
 
@@ -62,7 +61,6 @@ class VoiceCollectorApp {
       mainHomeView: document.getElementById('mainHomeView'),
       homeHeaderActions: document.getElementById('homeHeaderActions'),
       langSelect: document.getElementById('langSelect'),
-      themeToggleBtn: document.getElementById('themeToggleBtn'),
       savedCountBadge: document.getElementById('savedCountBadge'),
       exportZipBtn: document.getElementById('exportZipBtn'),
       viewListBtn: document.getElementById('viewListBtn'),
@@ -77,6 +75,9 @@ class VoiceCollectorApp {
       startRecordingBtn: document.getElementById('startRecordingBtn'),
 
       // Meta (Auto Persisted in Home)
+      metaSectionDetails: document.getElementById('metaSectionDetails'),
+      metaSummarySpeaker: document.getElementById('metaSummarySpeaker'),
+      metaSummaryGender: document.getElementById('metaSummaryGender'),
       speakerInput: document.getElementById('speakerInput'),
       homeGenderMaleBtn: document.getElementById('homeGenderMaleBtn'),
       homeGenderFemaleBtn: document.getElementById('homeGenderFemaleBtn'),
@@ -84,6 +85,7 @@ class VoiceCollectorApp {
       backToSetupBtn: document.getElementById('backToSetupBtn'),
 
       // Script Prompter
+      scriptDisplayBox: document.getElementById('scriptDisplayBox'),
       scriptLangButtons: document.getElementById('scriptLangButtons'),
       categorySelect: document.getElementById('categorySelect'),
       scriptProgressBar: document.getElementById('scriptProgressBar'),
@@ -141,7 +143,6 @@ class VoiceCollectorApp {
       mobileExportZipBtn: document.getElementById('mobileExportZipBtn'),
       mobileReadmeBtn: document.getElementById('mobileReadmeBtn'),
       mobileEditProfileBtn: document.getElementById('mobileEditProfileBtn'),
-      mobileThemeToggleBtn: document.getElementById('mobileThemeToggleBtn'),
 
       // Custom Touch-Friendly Audio Player
       customPlayBtn: document.getElementById('customPlayBtn'),
@@ -191,6 +192,8 @@ class VoiceCollectorApp {
     }
     this._updateScriptLangTabsUI();
     this._updateCategoryDropdownOptions();
+
+    this._updateMetaSummary();
 
     // Check if the user has already entered their info previously (skip setup page on next visits)
     const setupCompleted = localStorage.getItem(STORAGE_KEY_SETUP_COMPLETED) === 'true';
@@ -247,6 +250,7 @@ class VoiceCollectorApp {
       if (this.dom.setupSpeakerInput) {
         this.dom.setupSpeakerInput.value = e.target.value;
       }
+      this._updateMetaSummary();
     });
 
     if (this.dom.setupSpeakerInput) {
@@ -255,6 +259,7 @@ class VoiceCollectorApp {
         if (this.dom.speakerInput) {
           this.dom.speakerInput.value = e.target.value;
         }
+        this._updateMetaSummary();
       });
     }
 
@@ -359,12 +364,7 @@ class VoiceCollectorApp {
         this.showSetupView();
       });
     }
-    if (this.dom.mobileThemeToggleBtn) {
-      this.dom.mobileThemeToggleBtn.addEventListener('click', () => {
-        if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
-        this._toggleTheme();
-      });
-    }
+
 
     window.addEventListener('languageChanged', () => {
       if (this.dom.langSelect) this.dom.langSelect.value = getLanguage();
@@ -390,9 +390,6 @@ class VoiceCollectorApp {
         }
       }
     });
-
-    // Theme toggle
-    this.dom.themeToggleBtn.addEventListener('click', () => this._toggleTheme());
 
     // Category filter
     this.dom.categorySelect.addEventListener('change', (e) => {
@@ -590,6 +587,25 @@ class VoiceCollectorApp {
     if (this.dom.homeGenderFemaleBtn) {
       this.dom.homeGenderFemaleBtn.classList.toggle('active', isFemale);
     }
+    this._updateMetaSummary();
+  }
+
+  _updateMetaSummary() {
+    if (this.dom.metaSummarySpeaker) {
+      const speakerVal = (this.dom.speakerInput ? this.dom.speakerInput.value.trim() : '') ||
+                         (this.dom.setupSpeakerInput ? this.dom.setupSpeakerInput.value.trim() : '');
+      this.dom.metaSummarySpeaker.textContent = speakerVal || '未設定';
+    }
+    if (this.dom.metaSummaryGender) {
+      const gender = this.currentGender;
+      if (gender === 'male') {
+        this.dom.metaSummaryGender.textContent = '👨 ' + (t('genderMale') || '男性');
+      } else if (gender === 'female') {
+        this.dom.metaSummaryGender.textContent = '👩 ' + (t('genderFemale') || '女性');
+      } else {
+        this.dom.metaSummaryGender.textContent = '-';
+      }
+    }
   }
 
   proceedToHome() {
@@ -764,6 +780,12 @@ class VoiceCollectorApp {
 
   async startRecording() {
     try {
+      document.body.classList.add('is-recording');
+      // Ensure prompt script box is prominently in view
+      if (this.dom.scriptDisplayBox) {
+        this.dom.scriptDisplayBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
       this.dom.recordBtn.classList.add('hidden');
       this.dom.stopBtn.classList.remove('hidden');
       this.dom.stopBtn.classList.add('pulse-recording');
@@ -777,6 +799,7 @@ class VoiceCollectorApp {
       });
     } catch (err) {
       console.error(err);
+      document.body.classList.remove('is-recording');
       this.dom.recordBtn.classList.remove('hidden');
       this.dom.stopBtn.classList.add('hidden');
       this.dom.stopBtn.classList.remove('pulse-recording');
@@ -785,6 +808,7 @@ class VoiceCollectorApp {
   }
 
   async stopRecording() {
+    document.body.classList.remove('is-recording');
     this.dom.stopBtn.classList.add('hidden');
     this.dom.stopBtn.classList.remove('pulse-recording');
     this.dom.micStatusText.textContent = t('previewAudio');
@@ -844,6 +868,7 @@ class VoiceCollectorApp {
   }
 
   cancelReviewAndRerecord() {
+    document.body.classList.remove('is-recording');
     if (this.dom.audioPreviewPlayer) {
       this.dom.audioPreviewPlayer.pause();
       this.dom.audioPreviewPlayer.src = '';
@@ -1092,17 +1117,6 @@ class VoiceCollectorApp {
     }
   }
 
-  _initTheme() {
-    const savedTheme = localStorage.getItem('voice_collector_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  }
-
-  _toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    const next = current === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('voice_collector_theme', next);
-  }
 
   _getDeviceInfo() {
     return {
