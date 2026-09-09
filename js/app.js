@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.0';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.0';
-import { AudioRecorder } from './audio_recorder.js?v=3.0';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.0';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.0';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.1';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.1';
+import { AudioRecorder } from './audio_recorder.js?v=3.1';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.1';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.1';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -424,6 +424,9 @@ class VoiceCollectorApp {
       });
     }
 
+    // Auto-fit script text on viewport resize
+    window.addEventListener('resize', () => this._autoFitScriptText());
+
     // Font size toggle (if present)
     if (this.dom.fontSizeToggleBtn) {
       this.dom.fontSizeToggleBtn.addEventListener('click', () => {
@@ -705,6 +708,60 @@ class VoiceCollectorApp {
     }
   }
 
+  _autoFitScriptText() {
+    const el = this.dom.scriptDisplayArea;
+    const box = this.dom.scriptDisplayBox;
+    if (!el || !box) return;
+
+    // Reset inline styles and length classes
+    el.style.fontSize = '';
+    el.classList.remove('script-len-short', 'script-len-medium', 'script-len-long', 'script-len-xlong');
+
+    const text = (el.textContent || '').trim();
+    const textLen = text.length;
+    const isEnglish = (this.currentScriptLang === 'en');
+
+    // 1. Initial categorization by text length
+    if (isEnglish) {
+      if (textLen < 45) {
+        el.classList.add('script-len-short');
+      } else if (textLen < 80) {
+        el.classList.add('script-len-medium');
+      } else if (textLen < 120) {
+        el.classList.add('script-len-long');
+      } else {
+        el.classList.add('script-len-xlong');
+      }
+    } else {
+      if (textLen < 20) {
+        el.classList.add('script-len-short');
+      } else if (textLen < 42) {
+        el.classList.add('script-len-medium');
+      } else if (textLen < 65) {
+        el.classList.add('script-len-long');
+      } else {
+        el.classList.add('script-len-xlong');
+      }
+    }
+
+    // 2. Strict constraint: guarantee maximum 3 lines
+    requestAnimationFrame(() => {
+      const computed = window.getComputedStyle(el);
+      const lineHeight = parseFloat(computed.lineHeight) || 24;
+      const maxHeight = lineHeight * 3.1; // Max allowable height for 3 lines
+
+      let currentFontSize = parseFloat(computed.fontSize) || 18;
+      const minFontSize = 11; // Minimum legible font size
+
+      let iterations = 0;
+      while (el.scrollHeight > maxHeight && currentFontSize > minFontSize && iterations < 15) {
+        currentFontSize -= 1;
+        el.style.fontSize = `${currentFontSize}px`;
+        iterations++;
+      }
+    });
+  }
+
   loadScripts() {
     this.scripts = getScriptsForLang(this.currentScriptLang, this.currentCategory);
     if (this.currentCategory === 'custom') {
@@ -749,6 +806,7 @@ class VoiceCollectorApp {
       this.dom.scriptDisplayArea.textContent = script.text;
     }
     this._updateFuriganaBtn();
+    this._autoFitScriptText();
     const catLabel = t(`categories.${script.category}`) || script.title || script.category;
     this.dom.scriptCategoryLabel.textContent = catLabel;
     

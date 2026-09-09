@@ -11,7 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <link rel="stylesheet" href="css/style.css?v=3.1">
   <script>
     // Immediate cleanup of legacy dark theme remnants and check setup
     try {
@@ -252,9 +252,9 @@
         </div>
       </div>
 
-      <!-- Large Prompter Box (Max size font-xlarge) -->
+      <!-- Dynamic Prompter Box (Auto-scaled font, max 3 lines) -->
       <div id="scriptDisplayBox" class="script-display-box">
-        <p id="scriptDisplayArea" class="script-text font-xlarge">
+        <p id="scriptDisplayArea" class="script-text">
           これから音声認識テストをはじめます。
         </p>
       </div>
@@ -466,6 +466,6 @@
 
   <!-- Scripts -->
   <script src="lib/jszip.min.js"></script>
-  <script type="module" src="js/app.js?v=3.0"></script>
+  <script type="module" src="js/app.js?v=3.1"></script>
 </body>
 </html>

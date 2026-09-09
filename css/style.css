@@ -485,17 +485,18 @@ html.setup-completed #mobileHomeMenuItems {
 .btn-furigana-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
+  gap: 0.45rem;
+  padding: 0.32rem 0.8rem;
   border-radius: var(--radius-full);
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  border: 1px solid var(--border-card);
+  border: 1.5px solid var(--border-card);
   background: var(--bg-card);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
 }
 
 .btn-furigana-toggle:hover {
@@ -505,22 +506,29 @@ html.setup-completed #mobileHomeMenuItems {
 }
 
 .btn-furigana-toggle.active {
-  background: hsla(217, 91%, 60%, 0.12);
-  border-color: hsla(217, 91%, 60%, 0.4);
-  color: hsl(217, 91%, 45%);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--primary-glow);
 }
 
 .btn-furigana-toggle .furigana-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 50%;
-  background: hsla(217, 91%, 60%, 0.15);
-  font-size: 0.68rem;
+  background: hsla(220, 84%, 58%, 0.12);
+  font-size: 0.72rem;
   font-weight: 800;
-  color: inherit;
+  color: var(--primary);
+  transition: all 0.2s ease;
+}
+
+.btn-furigana-toggle.active .furigana-icon {
+  background: #ffffff;
+  color: var(--primary);
 }
 
 .script-badge {
@@ -543,19 +551,21 @@ html.setup-completed #mobileHomeMenuItems {
   border: 1px solid hsla(158, 75%, 40%, 0.3);
 }
 
-/* Prompt Text Area (Crisp & Legible) */
+/* Prompt Text Area (Max 3 lines constraint & crisp legibility) */
 .script-display-box {
   background: hsl(210, 30%, 97%);
   border: 1.5px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 1.5rem 1.25rem;
-  min-height: 120px;
+  padding: 0.85rem 1.25rem;
+  min-height: 95px;
+  max-height: 135px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 
 /* Focused Highlight during recording */
@@ -572,9 +582,20 @@ body.is-recording .script-text {
 .script-text {
   font-weight: 600;
   color: var(--text-main);
-  line-height: 2.15;
+  line-height: 1.55;
   user-select: none;
   transition: font-size 0.2s ease;
+  width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.script-text:has(ruby) {
+  line-height: 1.85;
 }
 
 .script-text ruby {
@@ -590,14 +611,30 @@ body.is-recording .script-text {
   user-select: none;
 }
 
-.font-normal { font-size: 1.15rem; }
-.font-large  { font-size: 1.45rem; }
-.font-xlarge { font-size: 1.85rem; }
+/* Dynamic length tiers (auto applied in JS to guarantee max 3 lines) */
+.script-len-short {
+  font-size: 1.55rem;
+}
+
+.script-len-medium {
+  font-size: 1.25rem;
+}
+
+.script-len-long {
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.script-len-xlong {
+  font-size: 0.92rem;
+  line-height: 1.38;
+}
 
 @media (max-width: 640px) {
-  .font-normal { font-size: 1.05rem; }
-  .font-large  { font-size: 1.25rem; }
-  .font-xlarge { font-size: 1.5rem; }
+  .script-len-short { font-size: 1.35rem; }
+  .script-len-medium { font-size: 1.12rem; }
+  .script-len-long { font-size: 0.94rem; line-height: 1.38; }
+  .script-len-xlong { font-size: 0.84rem; line-height: 1.32; }
 }
 
 .prompter-nav-bar {
@@ -1473,9 +1510,10 @@ body.is-recording .script-text {
   }
 
   .script-display-box {
-    min-height: 95px;
-    padding: 1rem 0.75rem;
-    margin-bottom: 0.65rem;
+    min-height: 85px;
+    max-height: 120px;
+    padding: 0.75rem 0.65rem;
+    margin-bottom: 0.55rem;
   }
 
   .waveform-canvas {
