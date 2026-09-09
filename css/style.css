@@ -56,7 +56,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
+  touch-action: manipulation;
   font-family: 'Inter', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
@@ -74,9 +81,10 @@ h1, h2, h3, h4, .brand-title {
   font-family: 'Outfit', 'Noto Sans Thai', sans-serif;
 }
 
-button, input, select, textarea {
+button, input, select, textarea, .btn, .btn-furigana-toggle, .status-pill-badge {
   font-family: inherit;
   color: inherit;
+  touch-action: manipulation;
 }
 
 /* ==========================================================================
@@ -609,15 +617,15 @@ html.setup-completed #mobileHomeMenuItems {
   background: hsl(210, 30%, 97%);
   border: 1.5px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 0.85rem 1.25rem;
-  min-height: 95px;
-  max-height: 135px;
+  padding: 0.75rem 1.15rem;
+  min-height: 112px;
+  max-height: 152px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   margin-bottom: 0.85rem;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   overflow: hidden;
 }
 
@@ -637,7 +645,6 @@ body.is-recording .script-text {
   color: var(--text-main);
   line-height: 1.55;
   user-select: none;
-  transition: font-size 0.2s ease;
   width: 100%;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -647,47 +654,64 @@ body.is-recording .script-text {
   overflow: hidden;
 }
 
+/* Furigana / Ruby: Full block formatting and 2.35 line-height completely prevents collision */
+.script-text.has-ruby,
 .script-text:has(ruby) {
-  line-height: 1.85;
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  line-height: 2.35 !important;
+  padding: 0.2rem 0;
 }
 
 .script-text ruby {
   ruby-align: center;
+  ruby-position: over;
+  display: inline-ruby;
 }
 
 .script-text rt {
   font-size: 0.52em;
   font-weight: 600;
-  color: hsl(217, 85%, 45%);
+  color: hsl(217, 85%, 42%);
   letter-spacing: -0.01em;
   line-height: 1;
   user-select: none;
+  display: ruby-text;
+  padding-bottom: 2px;
 }
 
-/* Dynamic length tiers (auto applied in JS to guarantee max 3 lines) */
+/* Balanced length tiers (gentle sizing steps prevent feeling of abrupt magnification) */
 .script-len-short {
-  font-size: 1.55rem;
+  font-size: 1.32rem;
 }
 
 .script-len-medium {
-  font-size: 1.25rem;
+  font-size: 1.18rem;
 }
 
 .script-len-long {
   font-size: 1.05rem;
-  line-height: 1.45;
 }
 
 .script-len-xlong {
-  font-size: 0.92rem;
-  line-height: 1.38;
+  font-size: 0.94rem;
+}
+
+/* Apply tighter line-height only when text has NO ruby */
+.script-text:not(.has-ruby):not(:has(ruby)).script-len-long {
+  line-height: 1.48;
+}
+
+.script-text:not(.has-ruby):not(:has(ruby)).script-len-xlong {
+  line-height: 1.4;
 }
 
 @media (max-width: 640px) {
-  .script-len-short { font-size: 1.35rem; }
-  .script-len-medium { font-size: 1.12rem; }
-  .script-len-long { font-size: 0.94rem; line-height: 1.38; }
-  .script-len-xlong { font-size: 0.84rem; line-height: 1.32; }
+  .script-len-short { font-size: 1.22rem; }
+  .script-len-medium { font-size: 1.10rem; }
+  .script-len-long { font-size: 0.98rem; }
+  .script-len-xlong { font-size: 0.88rem; }
 }
 
 .prompter-nav-bar {
@@ -695,6 +719,14 @@ body.is-recording .script-text {
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
+}
+
+#prevScriptBtn, #nextScriptBtn {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 42px;
 }
 
 /* Custom Script Input Container */

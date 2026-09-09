@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.2';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.2';
-import { AudioRecorder } from './audio_recorder.js?v=3.2';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.2';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.2';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.3';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.3';
+import { AudioRecorder } from './audio_recorder.js?v=3.3';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.3';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.3';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -411,8 +411,14 @@ class VoiceCollectorApp {
     });
 
     // Navigation
-    this.dom.prevScriptBtn.addEventListener('click', () => this.navigateScript(-1));
-    this.dom.nextScriptBtn.addEventListener('click', () => this.navigateScript(1));
+    this.dom.prevScriptBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.navigateScript(-1);
+    });
+    this.dom.nextScriptBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.navigateScript(1);
+    });
 
     // Furigana toggle
     if (this.dom.furiganaToggleBtn) {
@@ -708,7 +714,7 @@ class VoiceCollectorApp {
     }
   }
 
-  _autoFitScriptText() {
+  _autoFitScriptText(script, hasRuby) {
     const el = this.dom.scriptDisplayArea;
     const box = this.dom.scriptDisplayBox;
     if (!el || !box) return;
@@ -717,49 +723,49 @@ class VoiceCollectorApp {
     el.style.fontSize = '';
     el.classList.remove('script-len-short', 'script-len-medium', 'script-len-long', 'script-len-xlong');
 
-    const text = (el.textContent || '').trim();
-    const textLen = text.length;
+    // Use pure base text length to avoid counting ruby rt characters
+    const baseText = (script && script.text) ? script.text : (el.textContent || '').trim();
+    const textLen = baseText.length;
     const isEnglish = (this.currentScriptLang === 'en');
 
-    // 1. Initial categorization by text length
+    // 1. Initial categorization by pure text length (gentle tiers)
     if (isEnglish) {
       if (textLen < 45) {
         el.classList.add('script-len-short');
-      } else if (textLen < 80) {
+      } else if (textLen < 85) {
         el.classList.add('script-len-medium');
-      } else if (textLen < 120) {
+      } else if (textLen < 130) {
         el.classList.add('script-len-long');
       } else {
         el.classList.add('script-len-xlong');
       }
     } else {
-      if (textLen < 20) {
+      if (textLen < 22) {
         el.classList.add('script-len-short');
-      } else if (textLen < 42) {
+      } else if (textLen < 44) {
         el.classList.add('script-len-medium');
-      } else if (textLen < 65) {
+      } else if (textLen < 70) {
         el.classList.add('script-len-long');
       } else {
         el.classList.add('script-len-xlong');
       }
     }
 
-    // 2. Strict constraint: guarantee maximum 3 lines
-    requestAnimationFrame(() => {
-      const computed = window.getComputedStyle(el);
-      const lineHeight = parseFloat(computed.lineHeight) || 24;
-      const maxHeight = lineHeight * 3.1; // Max allowable height for 3 lines
+    // 2. Synchronous auto-fit constraint (prevents frame flash / zoom effect)
+    const computed = window.getComputedStyle(el);
+    const lineHeight = parseFloat(computed.lineHeight) || (hasRuby ? 38 : 24);
+    // Allowable inner height of script box (box max-height is 152px, padding is ~24px total)
+    const maxAllowedHeight = hasRuby ? 124 : Math.min(124, lineHeight * 3.15);
 
-      let currentFontSize = parseFloat(computed.fontSize) || 18;
-      const minFontSize = 11; // Minimum legible font size
+    let currentFontSize = parseFloat(computed.fontSize) || (hasRuby ? 16 : 18);
+    const minFontSize = hasRuby ? 11.5 : 11;
 
-      let iterations = 0;
-      while (el.scrollHeight > maxHeight && currentFontSize > minFontSize && iterations < 15) {
-        currentFontSize -= 1;
-        el.style.fontSize = `${currentFontSize}px`;
-        iterations++;
-      }
-    });
+    let iterations = 0;
+    while (el.scrollHeight > maxAllowedHeight && currentFontSize > minFontSize && iterations < 14) {
+      currentFontSize -= 0.5;
+      el.style.fontSize = `${currentFontSize}px`;
+      iterations++;
+    }
   }
 
   loadScripts() {
@@ -800,13 +806,15 @@ class VoiceCollectorApp {
     }
 
     const script = this.scripts[this.currentScriptIndex];
-    if (this.furiganaEnabled && script.ruby) {
+    const hasRuby = Boolean(this.furiganaEnabled && script.ruby);
+    this.dom.scriptDisplayArea.classList.toggle('has-ruby', hasRuby);
+    if (hasRuby) {
       this.dom.scriptDisplayArea.innerHTML = script.ruby;
     } else {
       this.dom.scriptDisplayArea.textContent = script.text;
     }
     this._updateFuriganaBtn();
-    this._autoFitScriptText();
+    this._autoFitScriptText(script, hasRuby);
     const catLabel = t(`categories.${script.category}`) || script.title || script.category;
     this.dom.scriptCategoryLabel.textContent = catLabel;
     
@@ -846,6 +854,9 @@ class VoiceCollectorApp {
     if (nextIdx >= 0 && nextIdx < this.scripts.length) {
       this.currentScriptIndex = nextIdx;
       this.renderCurrentScript();
+    }
+    if (document.activeElement && document.activeElement.blur) {
+      document.activeElement.blur();
     }
   }
 
