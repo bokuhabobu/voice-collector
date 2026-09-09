@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.4';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.4';
-import { AudioRecorder } from './audio_recorder.js?v=3.4';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.4';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.4';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.5';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.5';
+import { AudioRecorder } from './audio_recorder.js?v=3.5';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.5';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.5';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -753,15 +753,15 @@ class VoiceCollectorApp {
 
     // 2. Synchronous auto-fit constraint (prevents frame flash / zoom effect)
     const computed = window.getComputedStyle(el);
-    const lineHeight = parseFloat(computed.lineHeight) || (hasRuby ? 38 : 24);
-    // Allowable inner height of script box (box max-height is 152px, padding is ~24px total)
-    const maxAllowedHeight = hasRuby ? 124 : Math.min(124, lineHeight * 3.15);
+    const lineHeight = parseFloat(computed.lineHeight) || (hasRuby ? 36 : 24);
+    // Allowable inner height of script box (box max-height is 168px, padding ~28px total)
+    const maxAllowedHeight = hasRuby ? 122 : Math.min(125, lineHeight * 3.15);
 
-    let currentFontSize = parseFloat(computed.fontSize) || (hasRuby ? 16 : 18);
-    const minFontSize = hasRuby ? 11.5 : 11;
+    let currentFontSize = parseFloat(computed.fontSize) || (hasRuby ? 15.5 : 18);
+    const minFontSize = hasRuby ? 11 : 10.5;
 
     let iterations = 0;
-    while (el.scrollHeight > maxAllowedHeight && currentFontSize > minFontSize && iterations < 14) {
+    while (el.scrollHeight > maxAllowedHeight && currentFontSize > minFontSize && iterations < 16) {
       currentFontSize -= 0.5;
       el.style.fontSize = `${currentFontSize}px`;
       iterations++;

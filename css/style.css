@@ -620,9 +620,9 @@ html.setup-completed #mobileHomeMenuItems {
   background: hsl(210, 30%, 97%);
   border: 1.5px solid var(--border-card);
   border-radius: var(--radius-md);
-  padding: 0.75rem 1.15rem;
-  min-height: 112px;
-  max-height: 152px;
+  padding: 0.95rem 1.15rem 0.85rem;
+  min-height: 120px;
+  max-height: 168px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -657,14 +657,14 @@ body.is-recording .script-text {
   overflow: hidden;
 }
 
-/* Furigana / Ruby: Full block formatting and 2.35 line-height completely prevents collision */
+/* Furigana / Ruby: Full block formatting, generous line-height, and dedicated top padding */
 .script-text.has-ruby,
 .script-text:has(ruby) {
   display: block !important;
   -webkit-line-clamp: unset !important;
   -webkit-box-orient: unset !important;
-  line-height: 2.35 !important;
-  padding: 0.2rem 0;
+  line-height: 2.25 !important;
+  padding: 0.65rem 0 0.25rem; /* Guarantees line 1 furigana has plenty of head-room and never clips */
 }
 
 .script-text ruby {
@@ -686,19 +686,19 @@ body.is-recording .script-text {
 
 /* Balanced length tiers (gentle sizing steps prevent feeling of abrupt magnification) */
 .script-len-short {
-  font-size: 1.32rem;
+  font-size: 1.30rem;
 }
 
 .script-len-medium {
-  font-size: 1.18rem;
+  font-size: 1.15rem;
 }
 
 .script-len-long {
-  font-size: 1.05rem;
+  font-size: 1.00rem;
 }
 
 .script-len-xlong {
-  font-size: 0.94rem;
+  font-size: 0.90rem;
 }
 
 /* Apply tighter line-height only when text has NO ruby */
@@ -711,10 +711,16 @@ body.is-recording .script-text {
 }
 
 @media (max-width: 640px) {
-  .script-len-short { font-size: 1.22rem; }
-  .script-len-medium { font-size: 1.10rem; }
-  .script-len-long { font-size: 0.98rem; }
-  .script-len-xlong { font-size: 0.88rem; }
+  .script-display-box {
+    min-height: 116px;
+    max-height: 162px;
+    padding: 0.85rem 0.95rem 0.75rem;
+  }
+
+  .script-len-short { font-size: 1.20rem; }
+  .script-len-medium { font-size: 1.06rem; }
+  .script-len-long { font-size: 0.94rem; }
+  .script-len-xlong { font-size: 0.85rem; }
 
   .script-actions-row {
     gap: 0.45rem;
