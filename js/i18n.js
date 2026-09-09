@@ -48,15 +48,13 @@ export const translations = {
     setupAutoSavedHint: "※ 入力した情報はブラウザに自動保存されます",
 
     // Speaker Section
-    metaSectionTitle: "1. 基本情報",
-    editProfileHint: "変更・詳細 ▼",
     speakerLabel: "お名前",
     speakerPlaceholder: "例: 田中 太郎",
     customNoteLabel: "備考・補足",
     customNotePlaceholder: "例: エアコン直下、早口、小声、マスク着用など",
 
     // Script Section
-    scriptSectionTitle: "2. 読み上げスクリプト",
+    scriptSectionTitle: "読み上げスクリプト",
     scriptLangLabel: "スクリプト言語",
     categoryLabel: "カテゴリ",
     categories: {
@@ -77,8 +75,8 @@ export const translations = {
     customScriptPlaceholder: "ここに読み上げたい任意のテキストを入力してください...",
     addCustomScriptBtn: "追加",
 
-    // Recorder Section
-    recorderSectionTitle: "3. 録音 & 確認",
+    // Recording Section
+    recorderSectionTitle: "録音 & 確認",
     micReady: "マイク準備完了",
     recordingStatus: "録音中...",
     recordBtn: "録音開始",
@@ -160,15 +158,13 @@ export const translations = {
     setupAutoSavedHint: "※ Information is automatically saved in your browser",
 
     // Speaker Section
-    metaSectionTitle: "1. Basic Info",
-    editProfileHint: "Edit ▼",
     speakerLabel: "Your Name",
     speakerPlaceholder: "e.g., Taro Tanaka",
     customNoteLabel: "Notes / Details",
     customNotePlaceholder: "e.g., Under AC, Fast speech, Whisper, Mask",
 
     // Script Section
-    scriptSectionTitle: "2. Prompt Script",
+    scriptSectionTitle: "Prompt Script",
     scriptLangLabel: "Script Language",
     categoryLabel: "Category",
     categories: {
@@ -189,8 +185,8 @@ export const translations = {
     customScriptPlaceholder: "Enter any custom sentence to read aloud...",
     addCustomScriptBtn: "Add",
 
-    // Recorder Section
-    recorderSectionTitle: "3. Record & Review",
+    // Recording Section
+    recorderSectionTitle: "Record & Review",
     micReady: "Microphone ready",
     recordingStatus: "Recording...",
     recordBtn: "Start Recording",
@@ -272,15 +268,13 @@ export const translations = {
     setupAutoSavedHint: "※ ข้อมูลที่กรอกจะถูกบันทึกในเบราว์เซอร์โดยอัตโนมัติ",
 
     // Speaker Section
-    metaSectionTitle: "1. ข้อมูลพื้นฐาน",
-    editProfileHint: "แก้ไข ▼",
     speakerLabel: "ชื่อ-นามสกุล",
     speakerPlaceholder: "เช่น สมชาย ใจดี",
     customNoteLabel: "หมายเหตุเพิ่มเติม",
     customNotePlaceholder: "เช่น มีเสียงแอร์, พูดเร็ว, กระซิบ, สวมหน้ากาก",
 
     // Script Section
-    scriptSectionTitle: "2. สคริปต์สำหรับอ่านออกเสียง",
+    scriptSectionTitle: "สคริปต์สำหรับอ่านออกเสียง",
     scriptLangLabel: "ภาษาของสคริปต์",
     categoryLabel: "หมวดหมู่",
     categories: {
@@ -301,8 +295,8 @@ export const translations = {
     customScriptPlaceholder: "พิมพ์ข้อความที่ต้องการให้อ่านออกเสียงที่นี่...",
     addCustomScriptBtn: "เพิ่ม",
 
-    // Recorder Section
-    recorderSectionTitle: "3. บันทึกเสียงและตรวจสอบ",
+    // Recording Section
+    recorderSectionTitle: "บันทึกเสียง & ตรวจสอบ",
     micReady: "ไมโครโฟนพร้อมใช้งาน",
     recordingStatus: "กำลังบันทึกเสียง...",
     recordBtn: "เริ่มบันทึก",

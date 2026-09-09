@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=2.6';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=2.6';
-import { AudioRecorder } from './audio_recorder.js?v=2.6';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=2.6';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=2.6';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.0';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.0';
+import { AudioRecorder } from './audio_recorder.js?v=3.0';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.0';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.0';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -39,6 +39,11 @@ class VoiceCollectorApp {
   }
 
   async init() {
+    try {
+      localStorage.removeItem('voice_collector_theme');
+      document.documentElement.removeAttribute('data-theme');
+    } catch(e) {}
+
     initI18n();
     await initDB();
 
@@ -74,10 +79,9 @@ class VoiceCollectorApp {
       setupNoteInput: document.getElementById('setupNoteInput'),
       startRecordingBtn: document.getElementById('startRecordingBtn'),
 
-      // Meta (Auto Persisted in Home)
-      metaSectionDetails: document.getElementById('metaSectionDetails'),
-      metaSummarySpeaker: document.getElementById('metaSummarySpeaker'),
-      metaSummaryGender: document.getElementById('metaSummaryGender'),
+      // Meta & Speaker Quick Pill
+      speakerProfilePill: document.getElementById('speakerProfilePill'),
+      activeSpeakerPillText: document.getElementById('activeSpeakerPillText'),
       speakerInput: document.getElementById('speakerInput'),
       homeGenderMaleBtn: document.getElementById('homeGenderMaleBtn'),
       homeGenderFemaleBtn: document.getElementById('homeGenderFemaleBtn'),
@@ -193,7 +197,7 @@ class VoiceCollectorApp {
     this._updateScriptLangTabsUI();
     this._updateCategoryDropdownOptions();
 
-    this._updateMetaSummary();
+    this._updateSpeakerPill();
 
     // Check if the user has already entered their info previously (skip setup page on next visits)
     const setupCompleted = localStorage.getItem(STORAGE_KEY_SETUP_COMPLETED) === 'true';
@@ -245,13 +249,15 @@ class VoiceCollectorApp {
 
   _bindEvents() {
     // Input persistence and bidirectional synchronization between Setup and Home
-    this.dom.speakerInput.addEventListener('input', (e) => {
-      localStorage.setItem(STORAGE_KEY_SPEAKER, e.target.value);
-      if (this.dom.setupSpeakerInput) {
-        this.dom.setupSpeakerInput.value = e.target.value;
-      }
-      this._updateMetaSummary();
-    });
+    if (this.dom.speakerInput) {
+      this.dom.speakerInput.addEventListener('input', (e) => {
+        localStorage.setItem(STORAGE_KEY_SPEAKER, e.target.value);
+        if (this.dom.setupSpeakerInput) {
+          this.dom.setupSpeakerInput.value = e.target.value;
+        }
+        this._updateSpeakerPill();
+      });
+    }
 
     if (this.dom.setupSpeakerInput) {
       this.dom.setupSpeakerInput.addEventListener('input', (e) => {
@@ -259,7 +265,7 @@ class VoiceCollectorApp {
         if (this.dom.speakerInput) {
           this.dom.speakerInput.value = e.target.value;
         }
-        this._updateMetaSummary();
+        this._updateSpeakerPill();
       });
     }
 
@@ -361,6 +367,11 @@ class VoiceCollectorApp {
     if (this.dom.mobileEditProfileBtn) {
       this.dom.mobileEditProfileBtn.addEventListener('click', () => {
         if (this.dom.mobileMenuDrawer) this.dom.mobileMenuDrawer.classList.add('hidden');
+        this.showSetupView();
+      });
+    }
+    if (this.dom.speakerProfilePill) {
+      this.dom.speakerProfilePill.addEventListener('click', () => {
         this.showSetupView();
       });
     }
@@ -587,24 +598,20 @@ class VoiceCollectorApp {
     if (this.dom.homeGenderFemaleBtn) {
       this.dom.homeGenderFemaleBtn.classList.toggle('active', isFemale);
     }
-    this._updateMetaSummary();
+    this._updateSpeakerPill();
   }
 
-  _updateMetaSummary() {
-    if (this.dom.metaSummarySpeaker) {
+  _updateSpeakerPill() {
+    if (this.dom.activeSpeakerPillText) {
       const speakerVal = (this.dom.speakerInput ? this.dom.speakerInput.value.trim() : '') ||
-                         (this.dom.setupSpeakerInput ? this.dom.setupSpeakerInput.value.trim() : '');
-      this.dom.metaSummarySpeaker.textContent = speakerVal || '未設定';
-    }
-    if (this.dom.metaSummaryGender) {
+                         (this.dom.setupSpeakerInput ? this.dom.setupSpeakerInput.value.trim() : '') ||
+                         localStorage.getItem(STORAGE_KEY_SPEAKER);
       const gender = this.currentGender;
-      if (gender === 'male') {
-        this.dom.metaSummaryGender.textContent = '👨 ' + (t('genderMale') || '男性');
-      } else if (gender === 'female') {
-        this.dom.metaSummaryGender.textContent = '👩 ' + (t('genderFemale') || '女性');
-      } else {
-        this.dom.metaSummaryGender.textContent = '-';
-      }
+      let genderStr = '';
+      if (gender === 'male') genderStr = ' (👨)';
+      else if (gender === 'female') genderStr = ' (👩)';
+      
+      this.dom.activeSpeakerPillText.textContent = speakerVal ? `👤 ${speakerVal}${genderStr}` : '👤 未設定';
     }
   }
 

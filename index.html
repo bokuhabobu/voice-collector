@@ -11,10 +11,12 @@
   <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
   <script>
-    // Early check: if user already set up their profile, immediately show home view
+    // Immediate cleanup of legacy dark theme remnants and check setup
     try {
+      localStorage.removeItem('voice_collector_theme');
+      document.documentElement.removeAttribute('data-theme');
       if (localStorage.getItem('voice_collector_setup_completed') === 'true' ||
           localStorage.getItem('voice_collector_saved_speaker') ||
           localStorage.getItem('voice_collector_saved_gender')) {
@@ -183,71 +185,29 @@
   <!-- View 2: Main Recording Home Container -->
   <main id="mainHomeView" class="main-container hidden">
 
-    <!-- Section 1: Basic Info (Collapsible Compact Summary) -->
-    <details id="metaSectionDetails" class="glass-card meta-details-card" aria-labelledby="metaHeading">
-      <summary class="meta-details-summary">
-        <div class="meta-summary-left">
-          <span class="meta-icon">🏷️</span>
-          <span class="meta-summary-text">
-            <span class="meta-summary-title" data-i18n="metaSectionTitle">基本情報</span>:
-            <strong id="metaSummarySpeaker">未設定</strong>
-            <span id="metaSummaryGender" class="meta-summary-badge">-</span>
-          </span>
-        </div>
-        <div class="meta-summary-right">
-          <span class="meta-toggle-hint" data-i18n="editProfileHint">変更 ▼</span>
-        </div>
-      </summary>
+    <!-- Hidden form controls for persistence and backwards-compatibility -->
+    <div id="hiddenMetaStorage" style="display:none;" aria-hidden="true">
+      <input type="text" id="speakerInput">
+      <button type="button" id="homeGenderMaleBtn" data-gender="male"></button>
+      <button type="button" id="homeGenderFemaleBtn" data-gender="female"></button>
+      <input type="text" id="customNoteInput">
+      <button id="backToSetupBtn" type="button"></button>
+    </div>
 
-      <div class="meta-details-expanded-body">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 0.75rem;">
-          <h2 id="metaHeading" class="card-title">
-            <span>🏷️</span>
-            <span data-i18n="metaSectionTitle">1. 基本情報</span>
-          </h2>
-          <button id="backToSetupBtn" type="button" class="btn btn-outline btn-sm" data-i18n="backToSetupBtn" title="話者名・性別を変更する">
-            ✏️ プロフィール変更
-          </button>
-        </div>
-
-        <div class="meta-grid">
-          <!-- Speaker Input (Auto Persisted) -->
-          <div class="input-field-group">
-            <label for="speakerInput" class="input-label" data-i18n="speakerLabel">お名前</label>
-            <input type="text" id="speakerInput" class="text-input" data-i18n-placeholder="speakerPlaceholder" placeholder="例: 田中 太郎">
-          </div>
-
-          <!-- Gender Chip Selection in Home -->
-          <div class="input-field-group">
-            <label class="input-label" data-i18n="genderLabel">性別</label>
-            <div class="gender-selector-group gender-selector-compact" role="radiogroup">
-              <button type="button" id="homeGenderMaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="male">
-                <span class="gender-chip-icon">👨</span>
-                <span class="gender-chip-text" data-i18n="genderMale">男性</span>
-              </button>
-              <button type="button" id="homeGenderFemaleBtn" class="btn-gender-chip btn-gender-compact" data-gender="female">
-                <span class="gender-chip-icon">👩</span>
-                <span class="gender-chip-text" data-i18n="genderFemale">女性</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Custom Note Input (Auto Persisted) -->
-          <div class="input-field-group" style="grid-column: 1 / -1;">
-            <label for="customNoteInput" class="input-label" data-i18n="customNoteLabel">備考・補足</label>
-            <input type="text" id="customNoteInput" class="text-input" data-i18n-placeholder="customNotePlaceholder" placeholder="例: エアコン直下、早口、小声、マスク着用など">
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <!-- Section 2: Script Prompter Hero -->
+    <!-- Main Prompter Card (Hero Focus) -->
     <section class="glass-card prompter-card" aria-labelledby="scriptHeading">
       <div class="prompter-top-bar">
-        <h2 id="scriptHeading" class="card-title">
-          <span>📜</span>
-          <span data-i18n="scriptSectionTitle">2. 読み上げスクリプト</span>
-        </h2>
+        <div class="prompter-title-row">
+          <h2 id="scriptHeading" class="card-title">
+            <span>📜</span>
+            <span data-i18n="scriptSectionTitle">読み上げスクリプト</span>
+          </h2>
+          <!-- Speaker Profile Quick Badge (Click to Edit) -->
+          <button type="button" id="speakerProfilePill" class="speaker-pill-btn" title="話者名・性別を変更する">
+            <span id="activeSpeakerPillText">👤 未設定</span>
+            <span class="pill-edit-icon">✏️</span>
+          </button>
+        </div>
 
         <!-- Script Language Tabs & Category Filter -->
         <div class="prompter-controls-group">
@@ -316,12 +276,12 @@
       </div>
     </section>
 
-    <!-- Section 3: Recorder Controls & Oscilloscope -->
+    <!-- Section 2: Recorder Controls & Oscilloscope -->
     <section class="glass-card recorder-card" aria-labelledby="recorderHeading">
       <div class="card-header" style="width: 100%;">
         <h2 id="recorderHeading" class="card-title">
           <span>🎙️</span>
-          <span data-i18n="recorderSectionTitle">3. 録音 & 確認</span>
+          <span data-i18n="recorderSectionTitle">録音 & 確認</span>
         </h2>
       </div>
 
@@ -506,6 +466,6 @@
 
   <!-- Scripts -->
   <script src="lib/jszip.min.js"></script>
-  <script type="module" src="js/app.js?v=2.6"></script>
+  <script type="module" src="js/app.js?v=3.0"></script>
 </body>
 </html>
