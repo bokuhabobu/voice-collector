@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.1';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.1';
-import { AudioRecorder } from './audio_recorder.js?v=3.1';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.1';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.1';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.2';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.2';
+import { AudioRecorder } from './audio_recorder.js?v=3.2';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.2';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.2';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -819,14 +819,20 @@ class VoiceCollectorApp {
     this.dom.prevScriptBtn.disabled = (this.currentScriptIndex === 0);
     this.dom.nextScriptBtn.disabled = (this.currentScriptIndex === total - 1);
 
-    // Status Badge
+    // Status Badge (Pill Style Matching Furigana Toggle)
     const recordedTake = this.recordedMap[script.id];
     if (recordedTake) {
-      this.dom.scriptStatusBadge.textContent = `✓ ${t('statusRecorded')} (${recordedTake.durationSec}s)`;
-      this.dom.scriptStatusBadge.className = 'script-badge badge-recorded';
+      this.dom.scriptStatusBadge.innerHTML = `
+        <span class="status-pill-icon">✓</span>
+        <span class="status-pill-text">${t('statusRecorded')} (${recordedTake.durationSec}s)</span>
+      `;
+      this.dom.scriptStatusBadge.className = 'status-pill-badge badge-recorded';
     } else {
-      this.dom.scriptStatusBadge.textContent = `○ ${t('statusUnrecorded')}`;
-      this.dom.scriptStatusBadge.className = 'script-badge badge-unrecorded';
+      this.dom.scriptStatusBadge.innerHTML = `
+        <span class="status-pill-icon">○</span>
+        <span class="status-pill-text">${t('statusUnrecorded')}</span>
+      `;
+      this.dom.scriptStatusBadge.className = 'status-pill-badge badge-unrecorded';
     }
 
     // Reset review stage if active

@@ -11,7 +11,7 @@
   <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css?v=3.1">
+  <link rel="stylesheet" href="css/style.css?v=3.2">
   <script>
     // Immediate cleanup of legacy dark theme remnants and check setup
     try {
@@ -233,22 +233,26 @@
         </div>
       </div>
 
+      <!-- Script Index & Category (Moved to row above progress bar) -->
+      <div class="script-info-row">
+        <span id="scriptCounterText" class="script-counter-text">スクリプト 1 / 30</span>
+        <span id="scriptCategoryLabel" class="script-category-label"></span>
+      </div>
+
       <!-- Progress Bar -->
       <div class="progress-container">
         <div id="scriptProgressBar" class="progress-bar"></div>
       </div>
 
-      <div class="script-meta-row">
-        <div>
-          <span id="scriptCounterText" class="script-counter-text">スクリプト 1 / 30</span>
-          <span id="scriptCategoryLabel" style="font-size:0.82rem; color:var(--text-muted); margin-left: 0.5rem; font-weight: 600;"></span>
-        </div>
-        <div class="script-meta-actions">
-          <button type="button" id="furiganaToggleBtn" class="btn-furigana-toggle active" title="ふりがな表示切替">
-            <span class="furigana-icon">あ</span>
-            <span class="furigana-text" data-i18n="furiganaBtn">ふりがな</span>
-          </button>
-          <span id="scriptStatusBadge" class="script-badge badge-unrecorded">○ 未録音</span>
+      <!-- Actions Row: Furigana Toggle & Status Badge -->
+      <div class="script-actions-row">
+        <button type="button" id="furiganaToggleBtn" class="btn-furigana-toggle active" title="ふりがな表示切替">
+          <span class="furigana-icon">あ</span>
+          <span class="furigana-text" data-i18n="furiganaBtn">ふりがな</span>
+        </button>
+        <div id="scriptStatusBadge" class="status-pill-badge badge-unrecorded">
+          <span class="status-pill-icon">○</span>
+          <span class="status-pill-text">未録音</span>
         </div>
       </div>
 
@@ -466,6 +470,6 @@
 
   <!-- Scripts -->
   <script src="lib/jszip.min.js"></script>
-  <script type="module" src="js/app.js?v=3.1"></script>
+  <script type="module" src="js/app.js?v=3.2"></script>
 </body>
 </html>
