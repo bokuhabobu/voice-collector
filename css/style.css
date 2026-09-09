@@ -495,21 +495,22 @@ html.setup-completed #mobileHomeMenuItems {
   border-radius: var(--radius-full);
 }
 
-/* Actions Row: Furigana Toggle & Status Pill */
+/* Actions Row: Furigana Toggle & Status Pill (Always single line, never wrap) */
 .script-actions-row {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 0.65rem;
   margin-bottom: 0.75rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important;
+  width: 100%;
 }
 
 .btn-furigana-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.32rem 0.8rem;
+  padding: 0.32rem 0.75rem;
   border-radius: var(--radius-full);
   font-size: 0.82rem;
   font-weight: 700;
@@ -520,6 +521,7 @@ html.setup-completed #mobileHomeMenuItems {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-furigana-toggle:hover {
@@ -561,7 +563,7 @@ html.setup-completed #mobileHomeMenuItems {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.32rem 0.8rem;
+  padding: 0.32rem 0.75rem;
   border-radius: var(--radius-full);
   font-size: 0.82rem;
   font-weight: 700;
@@ -572,6 +574,7 @@ html.setup-completed #mobileHomeMenuItems {
   white-space: nowrap;
   user-select: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
 }
 
 .status-pill-badge .status-pill-icon {
@@ -712,6 +715,22 @@ body.is-recording .script-text {
   .script-len-medium { font-size: 1.10rem; }
   .script-len-long { font-size: 0.98rem; }
   .script-len-xlong { font-size: 0.88rem; }
+
+  .script-actions-row {
+    gap: 0.45rem;
+  }
+  .btn-furigana-toggle,
+  .status-pill-badge {
+    padding: 0.26rem 0.62rem;
+    font-size: 0.78rem;
+    gap: 0.35rem;
+  }
+  .btn-furigana-toggle .furigana-icon,
+  .status-pill-badge .status-pill-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    font-size: 0.68rem;
+  }
 }
 
 .prompter-nav-bar {

@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.3';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.3';
-import { AudioRecorder } from './audio_recorder.js?v=3.3';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.3';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.3';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.4';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.4';
+import { AudioRecorder } from './audio_recorder.js?v=3.4';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.4';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.4';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
