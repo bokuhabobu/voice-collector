@@ -3,11 +3,11 @@
  * Minimal White Aesthetic, Independent Script Language Tabs
  */
 
-import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.5';
-import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.5';
-import { AudioRecorder } from './audio_recorder.js?v=3.5';
-import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.5';
-import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.5';
+import { initI18n, setLanguage, getLanguage, t } from './i18n.js?v=3.7';
+import { getScriptsForLang, addCustomScript, deleteCustomScript } from './scripts_data.js?v=3.7';
+import { AudioRecorder } from './audio_recorder.js?v=3.7';
+import { initDB, saveRecording, getAllRecordings, getRecordedMap, deleteRecording, clearAllRecordings } from './storage.js?v=3.7';
+import { exportDatasetZip, triggerBlobDownload } from './export_zip.js?v=3.7';
 
 const STORAGE_KEY_SPEAKER = 'voice_collector_saved_speaker';
 const STORAGE_KEY_GENDER = 'voice_collector_saved_gender';
@@ -117,6 +117,11 @@ class VoiceCollectorApp {
       saveAndNextBtn: document.getElementById('saveAndNextBtn'),
       micStatusText: document.getElementById('micStatusText'),
 
+      // Quick Submit Bar
+      quickSubmitBar: document.getElementById('quickSubmitBar'),
+      quickSubmitProgressText: document.getElementById('quickSubmitProgressText'),
+      quickSubmitBtn: document.getElementById('quickSubmitBtn'),
+
       // Recordings Modal / Drawer
       recordingsModal: document.getElementById('recordingsModal'),
       closeModalBtn: document.getElementById('closeModalBtn'),
@@ -132,8 +137,29 @@ class VoiceCollectorApp {
       // Post-Export Submit Modal
       submitModal: document.getElementById('submitModal'),
       closeSubmitModalBtn: document.getElementById('closeSubmitModalBtn'),
-      closeSubmitFooterBtn: document.getElementById('closeSubmitFooterBtn'),
-      submitViaEmailBtn: document.getElementById('submitViaEmailBtn'),
+      closeSubmitModalFooterBtn: document.getElementById('closeSubmitModalFooterBtn'),
+      submitModalIcon: document.getElementById('submitModalIcon'),
+      submitModalTitleText: document.getElementById('submitModalTitleText'),
+      submitModalDescText: document.getElementById('submitModalDescText'),
+      submitSpeakerText: document.getElementById('submitSpeakerText'),
+      submitCountText: document.getElementById('submitCountText'),
+      submitFilenameText: document.getElementById('submitFilenameText'),
+
+      // Mobile Share Section
+      submitShareSection: document.getElementById('submitShareSection'),
+      submitViaShareBtn: document.getElementById('submitViaShareBtn'),
+      directDownloadZipBtn: document.getElementById('directDownloadZipBtn'),
+      switchToManualViewBtn: document.getElementById('switchToManualViewBtn'),
+
+      // Desktop / Manual Step-by-Step Section
+      submitManualSection: document.getElementById('submitManualSection'),
+      openEmailClientBtn: document.getElementById('openEmailClientBtn'),
+      copyEmailBtn: document.getElementById('copyEmailBtn'),
+      copySubjectBtn: document.getElementById('copySubjectBtn'),
+      copyEmailText: document.getElementById('copyEmailText'),
+      copySubjectText: document.getElementById('copySubjectText'),
+      reDownloadZipBtn: document.getElementById('reDownloadZipBtn'),
+      switchToShareViewBtn: document.getElementById('switchToShareViewBtn'),
 
       // Mobile Drawer & Hamburger
       mobileMenuToggleBtn: document.getElementById('mobileMenuToggleBtn'),
@@ -541,23 +567,75 @@ class VoiceCollectorApp {
       this.dom.readmeEmailSubmitBtn.addEventListener('click', () => this.submitViaEmail());
     }
 
-    // Post-Export Submit Modal Events
+    // Quick Submit Bar
+    if (this.dom.quickSubmitBtn) {
+      this.dom.quickSubmitBtn.addEventListener('click', () => this.handleExportZip());
+    }
+
+    // Submit Modal Events
     if (this.dom.closeSubmitModalBtn) {
       this.dom.closeSubmitModalBtn.addEventListener('click', () => this.closeSubmitModal());
     }
-    if (this.dom.closeSubmitFooterBtn) {
-      this.dom.closeSubmitFooterBtn.addEventListener('click', () => this.closeSubmitModal());
+    if (this.dom.closeSubmitModalFooterBtn) {
+      this.dom.closeSubmitModalFooterBtn.addEventListener('click', () => this.closeSubmitModal());
     }
     if (this.dom.submitModal) {
       this.dom.submitModal.addEventListener('click', (e) => {
         if (e.target === this.dom.submitModal) this.closeSubmitModal();
       });
     }
-    if (this.dom.submitViaEmailBtn) {
-      this.dom.submitViaEmailBtn.addEventListener('click', () => {
-        this.closeSubmitModal();
-        this.submitViaEmail();
+
+    // Mobile Share Action
+    if (this.dom.submitViaShareBtn) {
+      this.dom.submitViaShareBtn.addEventListener('click', () => this.submitViaEmail());
+    }
+
+    // Toggle between Share and Manual view
+    if (this.dom.switchToManualViewBtn) {
+      this.dom.switchToManualViewBtn.addEventListener('click', () => {
+        if (this.dom.submitShareSection) this.dom.submitShareSection.classList.add('hidden');
+        if (this.dom.submitManualSection) this.dom.submitManualSection.classList.remove('hidden');
       });
+    }
+    if (this.dom.switchToShareViewBtn) {
+      this.dom.switchToShareViewBtn.addEventListener('click', () => {
+        if (this.dom.submitManualSection) this.dom.submitManualSection.classList.add('hidden');
+        if (this.dom.submitShareSection) this.dom.submitShareSection.classList.remove('hidden');
+      });
+    }
+
+    // Desktop: Launch Email Client
+    if (this.dom.openEmailClientBtn) {
+      this.dom.openEmailClientBtn.addEventListener('click', () => this.launchMailto());
+    }
+
+    // Desktop: Copy Address & Subject
+    if (this.dom.copyEmailBtn) {
+      this.dom.copyEmailBtn.addEventListener('click', () => {
+        const info = this._getSubmissionInfo();
+        this.copyToClipboard(info.emailTo, '宛先メールアドレスをコピーしました！');
+      });
+    }
+    if (this.dom.copySubjectBtn) {
+      this.dom.copySubjectBtn.addEventListener('click', () => {
+        const info = this._getSubmissionInfo();
+        const subject = `【録音データ】VoiceCollector - ${info.speakerWithGender}`;
+        this.copyToClipboard(subject, '件名をコピーしました！');
+      });
+    }
+
+    // Download ZIP Buttons (direct & redownload)
+    const handleDownloadZip = () => {
+      if (this.lastExportedZip) {
+        triggerBlobDownload(this.lastExportedZip.blob, this.lastExportedZip.filename);
+        this.showToast(`📦 ${this.lastExportedZip.filename} をダウンロードしました`);
+      }
+    };
+    if (this.dom.directDownloadZipBtn) {
+      this.dom.directDownloadZipBtn.addEventListener('click', handleDownloadZip);
+    }
+    if (this.dom.reDownloadZipBtn) {
+      this.dom.reDownloadZipBtn.addEventListener('click', handleDownloadZip);
     }
 
     // Recordings Modal
@@ -785,6 +863,16 @@ class VoiceCollectorApp {
     }
     if (this.dom.mobileSavedCountBadge) {
       this.dom.mobileSavedCountBadge.textContent = `${count} 件`;
+    }
+    if (this.dom.quickSubmitBar) {
+      if (count > 0) {
+        this.dom.quickSubmitBar.classList.remove('hidden');
+        if (this.dom.quickSubmitProgressText) {
+          this.dom.quickSubmitProgressText.textContent = `${count} 件`;
+        }
+      } else {
+        this.dom.quickSubmitBar.classList.add('hidden');
+      }
     }
   }
 
@@ -1016,24 +1104,44 @@ class VoiceCollectorApp {
       this.navigateScript(1);
     } else {
       this.renderCurrentScript();
+      // Auto-trigger completion submit modal when reaching the end of the script list
+      setTimeout(() => {
+        this.handleExportZip({ isAutoOnComplete: true });
+      }, 400);
     }
   }
 
-  async handleExportZip() {
+  async handleExportZip(options = {}) {
+    const count = Object.keys(this.recordedMap).length;
+    if (count === 0) {
+      this.showToast(t('noDataToExport'), 'warning');
+      return;
+    }
+
     try {
       this.showToast(t('exportingZip'));
       const { blob, filename } = await exportDatasetZip();
       this.lastExportedZip = { blob, filename };
-      triggerBlobDownload(blob, filename);
-      this.showToast(`📦 ${filename} をダウンロードしました！`);
-      setTimeout(() => {
-        this.openSubmitModal();
-      }, 700);
+
+      const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const canShareFiles = Boolean(navigator.canShare);
+
+      // On desktop or when sharing is unavailable, automatically download ZIP
+      if (!isMobileDevice || !canShareFiles) {
+        triggerBlobDownload(blob, filename);
+        this.showToast(`📦 ${filename} をダウンロードしました！`);
+      }
+
+      this.openSubmitModal({
+        isComplete: Boolean(options.isAutoOnComplete),
+        filename,
+        preferShare: isMobileDevice && canShareFiles
+      });
     } catch (e) {
       if (e.message === 'NO_DATA') {
         this.showToast(t('noDataToExport'), 'warning');
       } else {
-        console.error(e);
+        console.error("Export error:", e);
         this.showToast("Export failed: " + e.message, 'error');
       }
     }
@@ -1056,18 +1164,18 @@ class VoiceCollectorApp {
   async submitViaEmail() {
     const info = this._getSubmissionInfo();
     const subject = `【録音データ】VoiceCollector - ${info.speakerWithGender}`;
-    const bodyPlain = `VoiceCollectorで録音した音声データを共有します。
+    const bodyPlain = `VoiceCollectorで録音した音声データを送付します。
 
 【録音情報】
 ・宛先：${info.emailTo}
 ・話者名：${info.speakerWithGender}
 ・備考：${info.note}
 ・録音件数：${info.count}件
-・データ作成日時：${info.formattedDate}
+・作成日時：${info.formattedDate}
 
-録音データのZIPファイルを添付しています。`;
+※ 録音データのZIPファイルを添付しています。`;
 
-    // 1. If Web Share API is supported with file sharing (iOS Safari, Android Chrome, Mac/Windows)
+    // 1. If Web Share API is supported with file sharing (iOS Safari, Android Chrome)
     if (this.lastExportedZip && navigator.canShare) {
       try {
         const file = new File([this.lastExportedZip.blob], this.lastExportedZip.filename, {
@@ -1088,18 +1196,88 @@ class VoiceCollectorApp {
           // User dismissed the share sheet
           return;
         }
-        console.warn("navigator.share with files fallback to mailto", err);
+        console.warn("navigator.share failed, fallback to mailto", err);
       }
     }
 
-    // 2. Fallback: mailto URL scheme
+    // 2. Fallback: Launch mailto URL scheme
+    this.launchMailto();
+  }
+
+  launchMailto() {
+    const info = this._getSubmissionInfo();
+    const subject = `【録音データ】VoiceCollector - ${info.speakerWithGender}`;
+    const bodyPlain = `VoiceCollectorで録音した音声データを送付します。
+
+【録音情報】
+・宛先：${info.emailTo}
+・話者名：${info.speakerWithGender}
+・備考：${info.note}
+・録音件数：${info.count}件
+・作成日時：${info.formattedDate}
+
+※ 保存されたZIPファイル（${this.lastExportedZip?.filename || 'voice_collector_xxx.zip'}）を添付して送信してください。`;
+
     const subjectEncoded = encodeURIComponent(subject);
     const bodyEncoded = encodeURIComponent(bodyPlain);
     const mailto = `mailto:${info.emailTo}?subject=${subjectEncoded}&body=${bodyEncoded}`;
     window.location.href = mailto;
   }
 
-  openSubmitModal() {
+  async copyToClipboard(text, successMsg) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      this.showToast(successMsg || t('copiedToast'));
+    } catch (e) {
+      console.warn("Clipboard copy failed", e);
+      this.showToast("コピーできませんでした", 'warning');
+    }
+  }
+
+  openSubmitModal(options = {}) {
+    const info = options.info || this._getSubmissionInfo();
+    const filename = options.filename || this.lastExportedZip?.filename || '-';
+    const isComplete = Boolean(options.isComplete);
+    const preferShare = options.preferShare !== undefined ? options.preferShare : Boolean(navigator.canShare);
+
+    if (this.dom.submitModalIcon) {
+      this.dom.submitModalIcon.textContent = isComplete ? '🎉' : '📤';
+    }
+    if (this.dom.submitModalTitleText) {
+      this.dom.submitModalTitleText.textContent = isComplete ? t('submitModalCompleteTitle') : t('submitModalTitle');
+    }
+    if (this.dom.submitModalDescText) {
+      this.dom.submitModalDescText.textContent = isComplete ? t('submitModalCompleteDesc') : t('submitModalDesc');
+    }
+
+    if (this.dom.submitSpeakerText) this.dom.submitSpeakerText.textContent = info.speakerWithGender;
+    if (this.dom.submitCountText) this.dom.submitCountText.textContent = `${info.count} 件`;
+    if (this.dom.submitFilenameText) this.dom.submitFilenameText.textContent = filename;
+
+    // Set Copy Texts
+    const subject = `【録音データ】VoiceCollector - ${info.speakerWithGender}`;
+    if (this.dom.copyEmailText) this.dom.copyEmailText.textContent = info.emailTo;
+    if (this.dom.copySubjectText) this.dom.copySubjectText.textContent = subject;
+
+    // Toggle Section visibility based on device environment
+    if (preferShare) {
+      if (this.dom.submitShareSection) this.dom.submitShareSection.classList.remove('hidden');
+      if (this.dom.submitManualSection) this.dom.submitManualSection.classList.add('hidden');
+      if (this.dom.switchToShareViewBtn) this.dom.switchToShareViewBtn.classList.remove('hidden');
+    } else {
+      if (this.dom.submitShareSection) this.dom.submitShareSection.classList.add('hidden');
+      if (this.dom.submitManualSection) this.dom.submitManualSection.classList.remove('hidden');
+    }
+
     if (this.dom.submitModal) {
       this.dom.submitModal.classList.remove('hidden');
     }
